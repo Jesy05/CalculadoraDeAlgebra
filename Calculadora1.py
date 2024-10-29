@@ -1,6 +1,7 @@
 import streamlit as st
 from modulos.eliminacionporgaus import eliminacion_por_gauss, print_matrix
 from modulos.escalonada import forma_escalonada, imprimir_matriz, imprimir_solucion
+from modulos.multiplicacion_vectores import multiplicacion_de_vectores
 
 # Función para recibir matrices como entrada
 def recibir_matriz():
@@ -17,12 +18,9 @@ def recibir_matriz():
     
     return matriz
 
-# Funciones ficticias para representar cada operación en otras categorías
+# Funciones placeholder (estas deben implementarse en el código real)
 def cramer_regla():
     st.write("Regla de Cramer")
-
-def multiplicacion_de_vectores():
-    st.write("Multiplicación de vectores")
 
 def vectores_suma():
     st.write("Suma de vectores")
