@@ -1,72 +1,114 @@
-# Calculadora1.py
-
 import streamlit as st
-from modulos.eliminacionporgaus import eliminacion_por_gauss, print_matrix
-from modulos.escalonada import forma_escalonada, imprimir_matriz, imprimir_solucion
 
-# Título de la aplicación
-st.title("Calculadora de Álgebra Lineal")
+# Funciones ficticias para representar cada operación
+def eliminacion_por_gauss():
+    st.write("Eliminación por Gauss")
 
-# Menú de opciones
-opcion = st.sidebar.selectbox("Selecciona una operación:", [
-    "Eliminación por Gauss",
-    "Matriz de forma escalonada",
-    "Multiplicación de vectores",
-    "Vectores",
-    "Ecuaciones vectoriales",
-    "Transpuestas",
-    "Determinante",
-    "Regla de Cramer",
-    "Matriz inversa"
-])
+def regla_de_cramer():
+    st.write("Regla de Cramer")
 
-# Ejecución del módulo para la eliminación por Gauss
-if opcion == "Eliminación por Gauss":
-    st.subheader("Eliminación por Gauss")
-    
-    n = st.number_input("Introduce el tamaño de la matriz aumentada (n x n+1):", min_value=2, max_value=10, step=1)
-    
-    # Entrada de los datos de la matriz
-    matrix = []
-    for i in range(int(n)):
-        row = st.text_input(f"Fila {i + 1} (introduce los valores separados por espacios):")
-        if row:
-            matrix.append(list(map(float, row.split())))
-    
-    # Verificación y ejecución de la eliminación de Gauss
-    if len(matrix) == n and all(len(row) == n + 1 for row in matrix):
-        st.write("Matriz inicial:")
-        print_matrix(matrix, [])
-        
-        result = eliminacion_por_gauss(matrix)
-        
-        if result:
-            st.write("Matriz final (matriz unitaria):")
-            for row in result:
-                st.write(" ".join(f"{int(num)}" if num.is_integer() else f"{num:.2f}" for num in row))
-    else:
-        st.warning("Introduce todas las filas de la matriz.")
+def multiplicacion_vectores():
+    st.write("Multiplicación de vectores")
 
-# Ejecución del módulo para la forma escalonada
-if opcion == "Matriz de forma escalonada":
-    st.subheader("Forma escalonada")
-    
-    # Obtener la matriz
-    n = st.number_input("Introduce el tamaño de la matriz (n x n+1):", min_value=2, max_value=10, step=1)
-    matrix = []
-    for i in range(int(n)):
-        row = st.text_input(f"Fila {i + 1} (introduce los valores separados por espacios):")
-        if row:
-            matrix.append(list(map(float, row.split())))
+def suma_vectores():
+    st.write("Suma de vectores")
 
-    # Verificar el tamaño y aplicar la forma escalonada
-    if len(matrix) == n and all(len(row) == n + 1 for row in matrix):
-        st.write("Matriz inicial:")
-        imprimir_matriz(matrix)
-        forma_escalonada(matrix)
-        st.write("Matriz en forma escalonada:")
-        imprimir_matriz(matrix)
-        st.write("Solución:")
-        imprimir_solucion(matrix)
-    else:
-        st.warning("Introduce todas las filas de la matriz correctamente.")
+def multiplicacion_vector_escalar():
+    st.write("Multiplicación de vector por escalar")
+
+def multiplicacion_matriz_vector():
+    st.write("Multiplicación de matriz por vector")
+
+def verificar_propiedad():
+    st.write("Verificar propiedad A(u + v) = Au + Av")
+
+def suma_matrices():
+    st.write("Suma de matrices")
+
+def resta_matrices():
+    st.write("Resta de matrices")
+
+def multiplicacion_matrices():
+    st.write("Multiplicación de matrices")
+
+def multiplicacion_matriz_escalar():
+    st.write("Multiplicación de matriz por un escalar")
+
+def matriz_inversa():
+    st.write("Matriz inversa")
+
+def transpuesta_propiedades():
+    st.write("Transpuesta con verificación de propiedades")
+
+def transpuesta_simple():
+    st.write("Transpuesta simple")
+
+def determinante():
+    st.write("Determinante")
+
+def matriz_escalonada():
+    st.write("Matriz en forma escalonada")
+
+# Menú Principal
+st.title("Calculadora Algebraica")
+
+menu_principal = st.selectbox("Seleccione una categoría:", 
+                              ["Resolución de Sistemas de Ecuaciones", 
+                               "Operaciones de Vectores", 
+                               "Operaciones con Matrices", 
+                               "Transformaciones de Matrices"])
+
+# Submenús basados en la selección
+if menu_principal == "Resolución de Sistemas de Ecuaciones":
+    operacion = st.radio("Seleccione una operación:", ["Eliminación por Gauss", "Regla de Cramer"])
+    if operacion == "Eliminación por Gauss":
+        eliminacion_por_gauss()
+    elif operacion == "Regla de Cramer":
+        regla_de_cramer()
+
+elif menu_principal == "Operaciones de Vectores":
+    operacion = st.radio("Seleccione una operación:", 
+                         ["Multiplicación de vectores", "Suma de vectores", 
+                          "Multiplicación de vector por escalar", 
+                          "Multiplicación de matriz por vector", 
+                          "Verificar propiedad A(u + v) = Au + Av"])
+    if operacion == "Multiplicación de vectores":
+        multiplicacion_vectores()
+    elif operacion == "Suma de vectores":
+        suma_vectores()
+    elif operacion == "Multiplicación de vector por escalar":
+        multiplicacion_vector_escalar()
+    elif operacion == "Multiplicación de matriz por vector":
+        multiplicacion_matriz_vector()
+    elif operacion == "Verificar propiedad A(u + v) = Au + Av":
+        verificar_propiedad()
+
+elif menu_principal == "Operaciones con Matrices":
+    operacion = st.radio("Seleccione una operación:", 
+                         ["Suma de matrices", "Resta de matrices", 
+                          "Multiplicación de matrices", 
+                          "Multiplicación de matriz por un escalar", 
+                          "Matriz inversa"])
+    if operacion == "Suma de matrices":
+        suma_matrices()
+    elif operacion == "Resta de matrices":
+        resta_matrices()
+    elif operacion == "Multiplicación de matrices":
+        multiplicacion_matrices()
+    elif operacion == "Multiplicación de matriz por un escalar":
+        multiplicacion_matriz_escalar()
+    elif operacion == "Matriz inversa":
+        matriz_inversa()
+
+elif menu_principal == "Transformaciones de Matrices":
+    operacion = st.radio("Seleccione una operación:", 
+                         ["Transpuesta (propiedades)", "Transpuesta simple", 
+                          "Determinante", "Matriz en forma escalonada"])
+    if operacion == "Transpuesta (propiedades)":
+        transpuesta_propiedades()
+    elif operacion == "Transpuesta simple":
+        transpuesta_simple()
+    elif operacion == "Determinante":
+        determinante()
+    elif operacion == "Matriz en forma escalonada":
+        matriz_escalonada()
