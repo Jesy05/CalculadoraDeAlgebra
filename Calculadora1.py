@@ -1,6 +1,6 @@
 import streamlit as st
-from modulos.eliminacion_gauss import eliminacion_por_gauss, print_matrix
-from modulos.forma_escalonada import forma_escalonada, imprimir_matriz, imprimir_solucion
+from modulos.eliminacionporgaus import eliminacion_por_gauss, print_matrix
+from modulos.escalonada import forma_escalonada, imprimir_matriz, imprimir_solucion
 
 # Función para recibir matrices como entrada
 def recibir_matriz():
