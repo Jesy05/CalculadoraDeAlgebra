@@ -1,4 +1,7 @@
+# Calculadora1.py
+
 import streamlit as st
+from modulos.eliminacion_gauss import eliminacion_por_gauss, print_matrix
 
 # Título de la aplicación
 st.title("Calculadora de Álgebra Lineal")
@@ -16,44 +19,29 @@ opcion = st.sidebar.selectbox("Selecciona una operación:", [
     "Matriz inversa"
 ])
 
-# Espacio para mostrar cada sección según la selección del usuario
+# Ejecución del módulo para la eliminación por Gauss
 if opcion == "Eliminación por Gauss":
     st.subheader("Eliminación por Gauss")
-    # Aquí colocaremos el código para la eliminación por Gauss
-
-elif opcion == "Matriz de forma escalonada":
-    st.subheader("Matriz de forma escalonada")
-    # Aquí colocaremos el código para la matriz de forma escalonada
-
-elif opcion == "Multiplicación de vectores":
-    st.subheader("Multiplicación de vectores")
-    # Aquí colocaremos el código para la multiplicación de vectores
-
-elif opcion == "Vectores":
-    st.subheader("Vectores")
-    # Aquí colocaremos el código para operaciones de vectores
-
-elif opcion == "Ecuaciones vectoriales":
-    st.subheader("Ecuaciones vectoriales")
-    # Aquí colocaremos el código para ecuaciones vectoriales
-
-elif opcion == "Transpuestas":
-    st.subheader("Transpuestas")
-    # Aquí colocaremos el código para operaciones con transpuestas
-
-elif opcion == "Determinante":
-    st.subheader("Determinante")
-    # Aquí colocaremos el código para calcular determinantes
-
-elif opcion == "Regla de Cramer":
-    st.subheader("Regla de Cramer")
-    # Aquí colocaremos el código para la regla de Cramer
-
-elif opcion == "Matriz inversa":
-    st.subheader("Matriz inversa")
-    # Aquí colocaremos el código para la matriz inversa
-
-# Si deseas agregar más opciones en el futuro, simplemente repite el patrón:
-# elif opcion == "Nombre de la nueva opción":
-#     st.subheader("Nombre de la nueva opción")
-#     # Aquí colocaremos el código para la nueva opción
+    
+    n = st.number_input("Introduce el tamaño de la matriz aumentada (n x n+1):", min_value=2, max_value=10, step=1)
+    
+    # Entrada de los datos de la matriz
+    matrix = []
+    for i in range(int(n)):
+        row = st.text_input(f"Fila {i + 1} (introduce los valores separados por espacios):")
+        if row:
+            matrix.append(list(map(float, row.split())))
+    
+    # Verificación y ejecución de la eliminación de Gauss
+    if len(matrix) == n and all(len(row) == n + 1 for row in matrix):
+        st.write("Matriz inicial:")
+        print_matrix(matrix, [])
+        
+        result = eliminacion_por_gauss(matrix)
+        
+        if result:
+            st.write("Matriz final (matriz unitaria):")
+            for row in result:
+                st.write(" ".join(f"{int(num)}" if num.is_integer() else f"{num:.2f}" for num in row))
+    else:
+        st.warning("Introduce todas las filas de la matriz.")
