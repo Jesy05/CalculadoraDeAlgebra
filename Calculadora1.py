@@ -2,6 +2,10 @@ import streamlit as st
 from modulos.eliminacionporgaus import eliminacion_por_gauss, print_matrix
 from modulos.escalonada import forma_escalonada, imprimir_matriz, imprimir_solucion
 from modulos.multiplicacion_vectores import multiplicacion_de_vectores
+from modulos. suma_vectores import sumar_vectores
+from modulos.suma_resta_matrices import restar_matrices, sumar_matrices
+from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
+# Asegúrate de importar otros módulos que ya tienes configurados
 
 # Función para recibir matrices como entrada
 def recibir_matriz():
@@ -18,7 +22,7 @@ def recibir_matriz():
     
     return matriz
 
-# Funciones placeholder (estas deben implementarse en el código real)
+# Placeholder para funciones aún no implementadas en el proyecto
 def cramer_regla():
     st.write("Regla de Cramer")
 
@@ -30,9 +34,6 @@ def vector_escalar_multiplicacion():
 
 def matriz_vector_multiplicacion():
     st.write("Multiplicación de matriz por vector")
-
-def propiedad_verificacion():
-    st.write("Verificar propiedad A(u + v) = Au + Av")
 
 def matrices_suma():
     st.write("Suma de matrices")
@@ -72,6 +73,11 @@ def escalonada_matriz():
     matriz = recibir_matriz()
     forma_escalonada(matriz)
     imprimir_solucion(matriz)
+
+# Función para la verificación de propiedad A(u + v) = Au + Av
+def propiedad_verificacion():
+    st.write("### Verificar propiedad A(u + v) = Au + Av")
+    verificar_propiedad_distribucionalidad()  # Llamada a la función en el módulo correspondiente
 
 # Menú Principal
 st.title("Calculadora Algebraica")
