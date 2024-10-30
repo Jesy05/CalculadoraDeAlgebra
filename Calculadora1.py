@@ -6,11 +6,11 @@ from modulos.suma_resta_matrices import sumar_matrices, restar_matrices
 from modulos.suma_vectores import suma_vectores
 from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
 
-# Función para recibir matrices como entrada
+
 def recibir_matriz():
     num_filas = st.number_input("Número de filas", min_value=1, max_value=5, value=3)
     num_columnas = st.number_input("Número de columnas", min_value=1, max_value=5, value=4)
-
+    
     matriz = []
     for i in range(num_filas):
         fila = []
@@ -18,8 +18,9 @@ def recibir_matriz():
             valor = st.number_input(f"Elemento ({i+1},{j+1})", format="%.2f")
             fila.append(valor)
         matriz.append(fila)
-
+    
     return matriz
+
 
 # Placeholders para funciones aún no implementadas
 def cramer_regla():
