@@ -2,6 +2,8 @@ import streamlit as st
 from modulos.eliminacionporgaus import eliminacion_por_gauss, print_matrix
 from modulos.escalonada import forma_escalonada, imprimir_matriz, imprimir_solucion
 from modulos.multiplicacion_vectores import multiplicacion_de_vectores
+from modulos.multiplicacion_matriz_vector import ejecutar_multiplicacion_matriz_por_vector  # Nuevo módulo
+from modulos.multiplicacion_vector_escalar import multiplicacion_vector_por_escalar  # Nuevo módulo
 from modulos.suma_resta_matrices import sumar_matrices, restar_matrices
 from modulos.suma_vectores import suma_vectores
 from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
@@ -22,38 +24,70 @@ def recibir_matriz():
     return matriz
 
 
-# Placeholders para funciones aún no implementadas
+def recibir_vector():
+    longitud = st.number_input("Longitud del vector", min_value=1, max_value=5, value=3)
+    vector = []
+    for i in range(longitud):
+        valor = st.number_input(f"Elemento {i+1}", format="%.2f")
+        vector.append(valor)
+    return vector
+
+
 def cramer_regla():
     st.write("### Regla de Cramer")
     st.write("Esta funcionalidad está en desarrollo.")
 
-def vector_escalar_multiplicacion():
-    st.write("### Multiplicación de Vector por Escalar")
-    st.write("Esta funcionalidad está en desarrollo.")
 
+# Función para multiplicación de vector por escalar
+def vector_escalar_multiplicacion():
+    escalar = st.number_input("Ingrese el valor del escalar", format="%.2f")
+    vector = recibir_vector()
+    resultado = multiplicacion_vector_por_escalar(escalar, vector)
+    st.write("Resultado de la multiplicación de vector por escalar:")
+    st.write(resultado)
+
+
+# Función para multiplicación de matriz por vector
 def matriz_vector_multiplicacion():
-    st.write("### Multiplicación de Matriz por Vector")
-    st.write("Esta funcionalidad está en desarrollo.")
+    matriz = recibir_matriz()
+    vector = recibir_vector()
+    
+    # Verificar que el número de columnas de la matriz sea igual a la longitud del vector
+    if len(matriz[0]) != len(vector):
+        st.write("Error: El número de columnas de la matriz debe coincidir con el número de elementos en el vector.")
+        return
+
+    # Llamar a la función de multiplicación solo si las dimensiones son compatibles
+    resultado = ejecutar_multiplicacion_matriz_por_vector(matriz, vector)
+    st.write("Resultado de la multiplicación de matriz por vector:")
+    st.write(resultado)
+
+
 
 def matrices_multiplicacion():
     st.write("### Multiplicación de Matrices")
     st.write("Esta funcionalidad está en desarrollo.")
 
+
 def inversa_matriz():
     st.write("### Inversa de una Matriz")
     st.write("Esta funcionalidad está en desarrollo.")
+
 
 def propiedades_transpuesta():
     st.write("### Transposición con Verificación de Propiedades")
     st.write("Esta funcionalidad está en desarrollo.")
 
+
 def transpuesta_simple():
     st.write("### Transposición Simple")
     st.write("Esta funcionalidad está en desarrollo.")
 
+
 def matriz_determinante():
     st.write("### Determinante de una Matriz")
     st.write("Esta funcionalidad está en desarrollo.")
+
 
 # Función principal de la calculadora
 def main():
@@ -136,6 +170,7 @@ def main():
         elif opcion == "Matriz en forma escalonada":
             matriz = recibir_matriz()
             forma_escalonada(matriz)
+
 
 if __name__ == "__main__":
     main()
