@@ -59,6 +59,7 @@ def vector_escalar_multiplicacion():
 
 # Función para multiplicación de matriz por vector
 def matriz_vector_multiplicacion():
+    st.write("### Multiplicación de matriz por verctor")
     matriz = recibir_matriz()
     vector = recibir_vector()
     
@@ -149,12 +150,14 @@ def main():
             "Inversa de una matriz"
         ])
         if opcion == "Suma de matrices":
+            st.write("### Suma de Matrices")
             A = recibir_matriz()
             B = recibir_matriz()
             resultado = sumar_matrices(A, B)
             st.write("Resultado de la suma de matrices:")
             st.write(resultado)
         elif opcion == "Resta de matrices":
+            st.write("### Resta de Matrices")
             A = recibir_matriz()
             B = recibir_matriz()
             resultado = restar_matrices(A, B)
@@ -179,10 +182,12 @@ def main():
         elif opcion == "Determinante":
             matriz_determinante()
         elif opcion == "Matriz en forma escalonada":
+            st.write("### Matriz en forma escalonada")
             matriz = recibir_matriz()
             forma_escalonada(matriz)
 
 
 if __name__ == "__main__":
     main()
+
 
