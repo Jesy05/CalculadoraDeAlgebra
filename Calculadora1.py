@@ -43,11 +43,18 @@ def cramer_regla():
 
 # Función para multiplicación de vector por escalar
 def vector_escalar_multiplicacion():
+    st.write("### Multiplicación de Vector por Escalar")
     escalar = st.number_input("Ingrese el valor del escalar", format="%.2f")
-    vector = recibir_vector()
-    resultado = multiplicacion_vector_por_escalar(escalar, vector)
-    st.write("Resultado de la multiplicación de vector por escalar:")
-    st.write(resultado)
+    vector = recibir_vector()  # Aquí recibes el vector
+    # Asegúrate de que el vector no esté vacío antes de multiplicar
+    if vector:  # Solo ejecuta si el vector tiene elementos
+        resultado = multiplicacion_vector_por_escalar(vector, escalar)  # Pasa el vector primero y luego el escalar
+        st.write("Resultado de la multiplicación de vector por escalar:")
+        st.write(resultado)
+    else:
+        st.write("Por favor, ingresa un vector válido.")
+
+
 
 
 # Función para multiplicación de matriz por vector
@@ -177,4 +184,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
