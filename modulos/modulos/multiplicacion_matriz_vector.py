@@ -1,6 +1,7 @@
 import streamlit as st
+from modulos.recibir_matriz import recibir_matriz
+from modulos.multiplicacion_matriz_vector import ejecutar_multiplicacion_matriz_por_vector
 
-from Calculadora1 import recibir_matriz
 
 def multiplicacion_matriz_por_vector(matriz, vector):
     if len(matriz[0]) != len(vector):
@@ -12,14 +13,8 @@ def multiplicacion_matriz_por_vector(matriz, vector):
         resultado.append(suma)
     return resultado
 
-def ejecutar_multiplicacion_matriz_por_vector():
+def ejecutar_multiplicacion_matriz_por_vector(matriz, vector):
     st.write("### Multiplicación de Matriz por Vector")
-    matriz = recibir_matriz()  # Usa la función recibir_matriz() que tienes para ingresar la matriz
-    vector = []
-    for i in range(len(matriz[0])):
-        valor = st.number_input(f"Elemento del vector en la posición {i+1}", format="%.2f")
-        vector.append(valor)
-    
     resultado = multiplicacion_matriz_por_vector(matriz, vector)
     if resultado:
         st.write("Resultado de la multiplicación:")
