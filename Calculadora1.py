@@ -7,6 +7,9 @@ from modulos.multiplicacion_vector_escalar import multiplicacion_vector_por_esca
 from modulos.suma_resta_matrices import sumar_matrices, restar_matrices
 from modulos.suma_vectores import suma_vectores
 from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
+from modulos.recibir_matriz import recibir_matriz
+from modulos.multiplicacion_matriz_vector import ejecutar_multiplicacion_matriz_por_vector
+
 
 
 def recibir_matriz():
