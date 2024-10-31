@@ -1,5 +1,7 @@
 import streamlit as st
-from Calculadora1 import recibir_matriz  # Asegúrate de que la función esté en este módulo
+from modulos.recibir_matriz import recibir_matriz
+from recibir_matriz import recibir_matriz
+
 
 def multiplicacion_matriz_por_vector(matriz, vector):
     if len(matriz[0]) != len(vector):
