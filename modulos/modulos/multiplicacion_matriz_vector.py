@@ -1,6 +1,5 @@
 import streamlit as st
 from modulos.recibir_matriz import recibir_matriz
-from recibir_matriz import recibir_matriz
 
 
 def multiplicacion_matriz_por_vector(matriz, vector):
@@ -19,4 +18,3 @@ def ejecutar_multiplicacion_matriz_por_vector(matriz, vector):
     if resultado:
         st.write("Resultado de la multiplicación:")
         st.write(resultado)
-
