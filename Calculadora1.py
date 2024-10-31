@@ -9,8 +9,7 @@ from modulos.suma_vectores import suma_vectores
 from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
 from modulos.recibir_matriz import recibir_matriz
 from modulos.multiplicacion_matriz_vector import ejecutar_multiplicacion_matriz_por_vector
-
-
+from modulos.regla_de_cramer import cramer_regla  # Asegúrate de tener el módulo cramer_regla
 
 def recibir_matriz():
     num_filas = st.number_input("Número de filas", min_value=1, max_value=5, value=3)
@@ -36,43 +35,32 @@ def recibir_vector():
     return vector
 
 
-def cramer_regla():
-    st.write("### Regla de Cramer")
-    st.write("Esta funcionalidad está en desarrollo.")
-
-
 # Función para multiplicación de vector por escalar
 def vector_escalar_multiplicacion():
     st.write("### Multiplicación de Vector por Escalar")
     escalar = st.number_input("Ingrese el valor del escalar", format="%.2f")
-    vector = recibir_vector()  # Aquí recibes el vector
-    # Asegúrate de que el vector no esté vacío antes de multiplicar
-    if vector:  # Solo ejecuta si el vector tiene elementos
-        resultado = multiplicacion_vector_por_escalar(vector, escalar)  # Pasa el vector primero y luego el escalar
+    vector = recibir_vector()
+    if vector:
+        resultado = multiplicacion_vector_por_escalar(vector, escalar)
         st.write("Resultado de la multiplicación de vector por escalar:")
         st.write(resultado)
     else:
         st.write("Por favor, ingresa un vector válido.")
 
 
-
-
 # Función para multiplicación de matriz por vector
 def matriz_vector_multiplicacion():
-    st.write("### Multiplicación de matriz por verctor")
+    st.write("### Multiplicación de Matriz por Vector")
     matriz = recibir_matriz()
     vector = recibir_vector()
     
-    # Verificar que el número de columnas de la matriz sea igual a la longitud del vector
     if len(matriz[0]) != len(vector):
         st.write("Error: El número de columnas de la matriz debe coincidir con el número de elementos en el vector.")
         return
 
-    # Llamar a la función de multiplicación solo si las dimensiones son compatibles
     resultado = ejecutar_multiplicacion_matriz_por_vector(matriz, vector)
     st.write("Resultado de la multiplicación de matriz por vector:")
     st.write(resultado)
-
 
 
 def matrices_multiplicacion():
@@ -100,12 +88,28 @@ def matriz_determinante():
     st.write("Esta funcionalidad está en desarrollo.")
 
 
+def cramer_calculadora():
+    st.write("### Regla de Cramer")
+    
+    matriz = recibir_matriz()
+    vector = recibir_vector()
+    
+    if len(matriz) != len(vector) or len(matriz) != len(matriz[0]):
+        st.write("Error: La matriz debe ser cuadrada y el tamaño debe coincidir con el vector.")
+        return
+
+    soluciones = cramer_regla(matriz, vector)
+    if soluciones:
+        st.write("Soluciones del sistema:")
+        for i, solucion in enumerate(soluciones, start=1):
+            st.write(f"x_{i} = {solucion}")
+
+
 # Función principal de la calculadora
 def main():
     st.title("Calculadora de Álgebra Lineal")
     st.write("Seleccione la operación que desea realizar:")
 
-    # Menú principal
     menu_principal = st.selectbox("Menú de Categorías", [
         "Resolución de Sistemas de Ecuaciones",
         "Operaciones de Vectores",
@@ -113,7 +117,6 @@ def main():
         "Transformaciones de Matrices"
     ])
 
-    # Submenús y llamadas a funciones
     if menu_principal == "Resolución de Sistemas de Ecuaciones":
         opcion = st.radio("Seleccione una operación:", ["Eliminación por Gauss", "Regla de Cramer"])
         if opcion == "Eliminación por Gauss":
@@ -121,7 +124,7 @@ def main():
             matriz = recibir_matriz()
             eliminacion_por_gauss(matriz)
         elif opcion == "Regla de Cramer":
-            cramer_regla()
+            cramer_calculadora()
 
     elif menu_principal == "Operaciones de Vectores":
         opcion = st.radio("Seleccione una operación:", [
