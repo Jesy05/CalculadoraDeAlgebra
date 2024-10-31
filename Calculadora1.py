@@ -2,8 +2,8 @@ import streamlit as st
 from modulos.eliminacionporgaus import eliminacion_por_gauss, print_matrix
 from modulos.escalonada import forma_escalonada, imprimir_matriz, imprimir_solucion
 from modulos.multiplicacion_vectores import multiplicacion_de_vectores
-from modulos.multiplicacion_matriz_vector import ejecutar_multiplicacion_matriz_por_vector  # Nuevo módulo
-from modulos.multiplicacion_vector_escalar import multiplicacion_vector_por_escalar  # Nuevo módulo
+from modulos.multiplicacion_matriz_vector import multiplicacion_matriz_por_vector  # Nuevo módulo
+from modulos.multiplicacion_vector_escalar import multiplicacion_vector_por_escalar
 from modulos.suma_resta_matrices import sumar_matrices, restar_matrices
 from modulos.suma_vectores import suma_vectores
 from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
