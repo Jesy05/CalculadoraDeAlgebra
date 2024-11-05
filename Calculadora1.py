@@ -9,7 +9,22 @@ from modulos.suma_vectores import suma_vectores
 from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
 from modulos.recibir_matriz import recibir_matriz
 from modulos.multiplicacion_matriz_vector import ejecutar_multiplicacion_matriz_por_vector
-from modulos.regla_de_cramer import cramer_regla  # Asegúrate de tener el módulo cramer_regla
+from modulos.regla_de_cramer import cramer_regla  
+
+# Configurar el estado inicial
+if "pagina_inicial" not in st.session_state:
+    st.session_state.pagina_inicial = True
+
+# Página de presentación
+if st.session_state.pagina_inicial:
+    st.title("Calculadora de Álgebra Lineal")
+    st.write("Aquí irá una descripción breve de la funcionalidad de la calculadora.")
+    if st.button("Comenzar"):
+        st.session_state.pagina_inicial = False  # Cambia a la calculadora después de hacer clic en comenzar
+else:
+    # Aquí inicia tu código de la calculadora de álgebra lineal
+    st.title("Calculadora de Álgebra Lineal")
+    # Agrega el código de tu calculadora aquí
 
 def recibir_matriz():
     num_filas = st.number_input("Número de filas", min_value=1, max_value=5, value=3)
@@ -192,4 +207,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
