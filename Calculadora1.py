@@ -18,12 +18,6 @@ if 'pagina_inicial' not in st.session_state:
 def cambiar_a_calculadora():
     st.session_state.pagina_inicial = False
 
-# Función para cambiar el tema
-def toggle_theme():
-    if 'theme' not in st.session_state:
-        st.session_state.theme = 'light'
-    st.session_state.theme = 'dark' if st.session_state.theme == 'light' else 'light'
-
 # Página de presentación
 if st.session_state.pagina_inicial:
     # Botón de menú en la esquina superior
@@ -34,13 +28,6 @@ if st.session_state.pagina_inicial:
         if st.session_state.get('show_sobre', False):
             st.write("### Sobre")
             st.write("Descripción sobre la calculadora.")
-
-        if st.button("Configuración de Apariencia"):
-            st.session_state.show_configuracion = not st.session_state.get('show_configuracion', False)
-        if st.session_state.get('show_configuracion', False):
-            if st.button("Modo Oscuro/Claro"):
-                toggle_theme()
-            st.write("### Configuración de Apariencia")
 
         if st.button("Notas de Uso"):
             st.session_state.show_notas = not st.session_state.get('show_notas', False)
