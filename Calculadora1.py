@@ -1,8 +1,8 @@
 import streamlit as st
-from modulos.eliminacionporgaus import eliminacion_por_gauss, print_matrix
+from modulos.eliminacionporgaus import eliminacion_por_gauss as eliminacion_por_gauss_modulo
 from modulos.escalonada import forma_escalonada, imprimir_matriz, imprimir_solucion
 from modulos.multiplicacion_vectores import multiplicacion_de_vectores
-from modulos.multiplicacion_matriz_vector import multiplicacion_matriz_por_vector, ejecutar_multiplicacion_matriz_por_vector
+from modulos.multiplicacion_matriz_vector import multiplicacion_matriz_por_vector
 from modulos.multiplicacion_vector_escalar import multiplicacion_vector_por_escalar
 from modulos.suma_resta_matrices import sumar_matrices, restar_matrices
 from modulos.suma_vectores import suma_vectores
@@ -18,72 +18,91 @@ if 'pagina_inicial' not in st.session_state:
 def cambiar_a_calculadora():
     st.session_state.pagina_inicial = False
 
+# Función para cambiar el tema
+def toggle_theme():
+    if 'theme' not in st.session_state:
+        st.session_state.theme = 'light'
+    st.session_state.theme = 'dark' if st.session_state.theme == 'light' else 'light'
+
 # Página de presentación
 if st.session_state.pagina_inicial:
-    st.markdown(
-        """
-        <style>
-        .centered {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
-        }
-        .top-links {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            position: absolute;
-            top: 10px;
-        }
-        .top-links div {
-            cursor: pointer;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+    # Botón de menú en la esquina superior
+    with st.sidebar:
+        st.title("Menú")
+        if st.button("Sobre"):
+            st.session_state.show_sobre = not st.session_state.get('show_sobre', False)
+        if st.session_state.get('show_sobre', False):
+            st.write("### Sobre")
+            st.write("Descripción sobre la calculadora.")
 
-    st.markdown(
-        """
-        <div class="top-links">
-            <div onclick="document.querySelector('input[value=\\'Sobre\\']').click()">Sobre</div>
-            <div onclick="document.querySelector('input[value=\\'Configuración de Apariencia\\']').click()">Configuración de Apariencia</div>
-            <div onclick="document.querySelector('input[value=\\'Notas de Uso\\']').click()">Notas de Uso</div>
-        </div>
-        <div class="centered">
-            <h1>Calculadora de Álgebra Lineal</h1>
-            <p>Aquí irá una descripción breve de la funcionalidad de la calculadora.</p>
-            <button onclick="document.querySelector('button[data-testid=\\'stButton\\']').click()">Comenzar</button>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        if st.button("Configuración de Apariencia"):
+            st.session_state.show_configuracion = not st.session_state.get('show_configuracion', False)
+        if st.session_state.get('show_configuracion', False):
+            if st.button("Modo Oscuro/Claro"):
+                toggle_theme()
+            st.write("### Configuración de Apariencia")
 
-    if st.button("Comenzar"):
-        cambiar_a_calculadora()
+        if st.button("Notas de Uso"):
+            st.session_state.show_notas = not st.session_state.get('show_notas', False)
+        if st.session_state.get('show_notas', False):
+            st.write("### Notas de Uso")
+            st.write("Notas sobre cómo usar la calculadora.")
+
 
 else:
-    # Aquí inicia tu código de la calculadora de álgebra lineal
-    pass
+    # Definiciones de funciones principales
+    def matriz_vector_multiplicacion():
+        st.write("### Multiplicación de Matriz por Vector")
+        matriz = recibir_matriz_local("matriz_vector")
+        vector = recibir_vector_local("vector_matriz")
+        
+        if len(matriz[0]) != len(vector):
+            st.write("Error: El número de columnas de la matriz debe coincidir con el número de elementos en el vector.")
+            return
+
+        resultado = ejecutar_multiplicacion_matriz_por_vector(matriz, vector)
+        st.write("Resultado de la multiplicación de matriz por vector:")
+        st.write(resultado)
+
+    def matrices_multiplicacion():
+        st.write("### Multiplicación de Matrices")
+        st.write("Esta funcionalidad está en desarrollo.")
+
+    # Sidebar con las funciones
+    st.sidebar.title("Funciones")
+    st.sidebar.button("Multiplicación de Matriz por Vector", on_click=matriz_vector_multiplicacion)
+    st.sidebar.button("Multiplicación de Matrices", on_click=matrices_multiplicacion)
+    # Agrega más botones para otras funciones según sea necesario
+
+    # Contenido principal de la calculadora
+    st.write("### Bienvenido a la Calculadora de Álgebra Lineal")
+    st.write("Seleccione una función en la barra lateral para comenzar.")
 
 # Definiciones de funciones principales
-def vector_escalar_multiplicacion():
-    st.write("### Multiplicación de Vector por Escalar")
-    escalar = st.number_input("Ingrese el valor del escalar", format="%.2f")
-    vector = recibir_vector()
-    if vector:
-        resultado = multiplicacion_vector_por_escalar(vector, escalar)
-        st.write("Resultado de la multiplicación de vector por escalar:")
-        st.write(resultado)
-    else:
-        st.write("Por favor, ingresa un vector válido.")
+def recibir_matriz_local(key_prefix="matriz"):
+    filas = st.number_input("Ingrese el número de filas:", min_value=1, step=1, key=f"{key_prefix}_filas")
+    columnas = st.number_input("Ingrese el número de columnas:", min_value=1, step=1, key=f"{key_prefix}_columnas")
+    matriz = []
+    for i in range(filas):
+        fila = []
+        for j in range(columnas):
+            valor = st.number_input(f"Ingrese el valor para la posición ({i+1}, {j+1}):", key=f"{key_prefix}_{i}_{j}")
+            fila.append(valor)
+        matriz.append(fila)
+    return matriz
+
+def recibir_vector_local(key_prefix="vector"):
+    longitud = st.number_input("Ingrese la longitud del vector:", min_value=1, step=1, key=f"{key_prefix}_longitud")
+    vector = []
+    for i in range(longitud):
+        valor = st.number_input(f"Ingrese el valor para la posición {i+1}:", key=f"{key_prefix}_{i}")
+        vector.append(valor)
+    return vector
 
 def matriz_vector_multiplicacion():
     st.write("### Multiplicación de Matriz por Vector")
-    matriz = recibir_matriz()
-    vector = recibir_vector()
+    matriz = recibir_matriz_local("matriz_vector")
+    vector = recibir_vector_local("vector_matriz")
     
     if len(matriz[0]) != len(vector):
         st.write("Error: El número de columnas de la matriz debe coincidir con el número de elementos en el vector.")
@@ -96,6 +115,10 @@ def matriz_vector_multiplicacion():
 def matrices_multiplicacion():
     st.write("### Multiplicación de Matrices")
     st.write("Esta funcionalidad está en desarrollo.")
+
+def ejecutar_multiplicacion_matriz_por_vector(matriz, vector) -> list[int]:
+    resultado = [sum(matriz[i][j] * vector[j] for j in range(len(vector))) for i in range(len(matriz))]
+    return resultado
 
 def inversa_matriz():
     st.write("### Inversa de una Matriz")
@@ -116,8 +139,8 @@ def matriz_determinante():
 def cramer_calculadora():
     st.write("### Regla de Cramer")
     
-    matriz = recibir_matriz()
-    vector = recibir_vector()
+    matriz = recibir_matriz_local("matriz_cramer")
+    vector = recibir_vector_local("vector_cramer")
     
     if len(matriz) != len(vector) or len(matriz) != len(matriz[0]):
         st.write("Error: La matriz debe ser cuadrada y el tamaño debe coincidir con el vector.")
@@ -129,9 +152,99 @@ def cramer_calculadora():
         for i, solucion in enumerate(soluciones, start=1):
             st.write(f"x_{i} = {solucion}")
 
+def suma_vectores():
+    st.write("### Suma de Vectores")
+    vector1 = recibir_vector_local("vector1")
+    vector2 = recibir_vector_local("vector2")
+    
+    if len(vector1) != len(vector2):
+        st.write("Error: Los vectores deben tener la misma longitud.")
+        return
+    
+    resultado = [vector1[i] + vector2[i] for i in range(len(vector1))]
+    st.write("Resultado de la suma de vectores:")
+    st.write(resultado)
+
+def multiplicacion_de_vectores():
+    st.write("### Multiplicación de Vectores")
+    vector1 = recibir_vector_local("vector1")
+    vector2 = recibir_vector_local("vector2")
+    
+    if len(vector1) != len(vector2):
+        st.write("Error: Los vectores deben tener la misma longitud.")
+        return
+    
+    resultado = [vector1[i] * vector2[i] for i in range(len(vector1))]
+    st.write("Resultado de la multiplicación de vectores:")
+    st.write(resultado)
+
+def multiplicacion_vector_por_escalar(vector, escalar):
+    resultado = [escalar * v for v in vector]
+    return resultado
+
+def verificar_propiedad_distribucionalidad():
+    st.write("### Verificar propiedad A(u + v) = Au + Av")
+    matriz = recibir_matriz_local("matriz_distribucionalidad")
+    vector_u = recibir_vector_local("vector_u")
+    vector_v = recibir_vector_local("vector_v")
+    
+    if len(matriz[0]) != len(vector_u) or len(vector_u) != len(vector_v):
+        st.write("Error: Las dimensiones de la matriz y los vectores no coinciden.")
+        return
+    
+    suma_vectores = [vector_u[i] + vector_v[i] for i in range(len(vector_u))]
+    resultado_suma = ejecutar_multiplicacion_matriz_por_vector(matriz, suma_vectores)
+    resultado_u = ejecutar_multiplicacion_matriz_por_vector(matriz, vector_u)
+    resultado_v = ejecutar_multiplicacion_matriz_por_vector(matriz, vector_v)
+    resultado_suma_individual = [resultado_u[i] + resultado_v[i] for i in range(len(resultado_u))]
+    
+    st.write("Resultado de A(u + v):")
+    st.write(resultado_suma)
+    st.write("Resultado de Au + Av:")
+    st.write(resultado_suma_individual)
+    
+    if resultado_suma == resultado_suma_individual:
+        st.write("La propiedad A(u + v) = Au + Av se verifica.")
+    else:
+        st.write("La propiedad A(u + v) = Au + Av no se verifica.")
+
+def sumar_matrices(A, B):
+    if len(A) != len(B) or len(A[0]) != len(B[0]):
+        st.write("Error: Las matrices deben tener las mismas dimensiones.")
+        return None
+    resultado = [[A[i][j] + B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
+    return resultado
+
+def restar_matrices(A, B):
+    if len(A) != len(B) or len(A[0]) != len(B[0]):
+        st.write("Error: Las matrices deben tener las mismas dimensiones.")
+        return None
+    resultado = [[A[i][j] - B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
+    return resultado
+
+def cramer_regla(matriz, vector):
+    import numpy as np
+    det_matriz = np.linalg.det(matriz)
+    if det_matriz == 0:
+        st.write("Error: La matriz no tiene inversa, por lo tanto, no se puede aplicar la regla de Cramer.")
+        return None
+
+    soluciones = []
+    for i in range(len(vector)):
+        matriz_modificada = np.copy(matriz)
+        matriz_modificada[:, i] = vector
+        det_modificada = np.linalg.det(matriz_modificada)
+        soluciones.append(det_modificada / det_matriz)
+
+    return soluciones
+
+def eliminacion_por_gauss(matriz):
+    eliminacion_por_gauss_modulo(matriz)
+
 # Función principal de la calculadora
 def main():
     st.title("Calculadora de Álgebra Lineal")
+    st.write("Calculadora para realizar operaciones con matrices y vectores. Ideal para estudiantes y profesionales que buscan resolver problemas de álgebra lineal de forma rápida y sencilla.")
     st.write("Seleccione la operación que desea realizar:")
 
     menu_principal = st.selectbox("Menú de Categorías", [
@@ -145,7 +258,7 @@ def main():
         opcion = st.radio("Seleccione una operación:", ["Eliminación por Gauss", "Regla de Cramer"])
         if opcion == "Eliminación por Gauss":
             st.write("### Eliminación por Gauss ")
-            matriz = recibir_matriz()
+            matriz = recibir_matriz_local("matriz_gauss")
             eliminacion_por_gauss(matriz)
         elif opcion == "Regla de Cramer":
             cramer_calculadora()
@@ -163,7 +276,11 @@ def main():
         elif opcion == "Suma de vectores":
             suma_vectores()
         elif opcion == "Multiplicación de vector por escalar":
-            vector_escalar_multiplicacion()
+            vector = recibir_vector_local("vector_escalar")
+            escalar = st.number_input("Ingrese el escalar:", key="escalar")
+            resultado = multiplicacion_vector_por_escalar(vector, escalar)
+            st.write("Resultado de la multiplicación de vector por escalar:")
+            st.write(resultado)
         elif opcion == "Multiplicación de matriz por vector":
             matriz_vector_multiplicacion()
         elif opcion == "Verificar propiedad A(u + v) = Au + Av":
@@ -178,15 +295,15 @@ def main():
         ])
         if opcion == "Suma de matrices":
             st.write("### Suma de Matrices")
-            A = recibir_matriz()
-            B = recibir_matriz()
+            A = recibir_matriz_local("matriz_suma_A")
+            B = recibir_matriz_local("matriz_suma_B")
             resultado = sumar_matrices(A, B)
             st.write("Resultado de la suma de matrices:")
             st.write(resultado)
         elif opcion == "Resta de matrices":
             st.write("### Resta de Matrices")
-            A = recibir_matriz()
-            B = recibir_matriz()
+            A = recibir_matriz_local("matriz_resta_A")
+            B = recibir_matriz_local("matriz_resta_B")
             resultado = restar_matrices(A, B)
             st.write("Resultado de la resta de matrices:")
             st.write(resultado)
@@ -210,8 +327,8 @@ def main():
             matriz_determinante()
         elif opcion == "Matriz en forma escalonada":
             st.write("### Matriz en forma escalonada")
-            matriz = recibir_matriz()
-            forma_escalonada(matriz)
+            matriz = recibir_matriz_local("matriz_escalonada")
+            eliminacion_por_gauss(matriz)
 
 if __name__ == "__main__":
     main()
