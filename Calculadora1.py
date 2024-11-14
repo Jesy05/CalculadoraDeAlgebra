@@ -29,11 +29,18 @@ if st.session_state.pagina_inicial:
             st.write("### Sobre")
             st.write("Descripción sobre la calculadora.")
 
+
         if st.button("Notas de Uso"):
             st.session_state.show_notas = not st.session_state.get('show_notas', False)
         if st.session_state.get('show_notas', False):
             st.write("### Notas de Uso")
             st.write("Notas sobre cómo usar la calculadora.")
+
+        if st.button("Juega"):
+            st.session_state.show_juega = not st.session_state.get('show_juega', False)
+        if st.session_state.get('show_juega', False):
+            st.write("### Juega")
+            st.write("¡Juega para ejercitar tus conocimientos!")    
 
 
 else:
