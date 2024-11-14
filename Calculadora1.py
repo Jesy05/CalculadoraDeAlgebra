@@ -9,45 +9,57 @@ from modulos.suma_vectores import suma_vectores
 from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
 from modulos.recibir_matriz import recibir_matriz, recibir_vector
 from modulos.regla_de_cramer import cramer_regla
+from modulos.juega import pantalla_juego, reset_timer, start_timer
 
 # Inicializar la clave 'pagina_inicial' en st.session_state si no existe
 if 'pagina_inicial' not in st.session_state:
     st.session_state.pagina_inicial = True
+if 'juego_activo' not in st.session_state:
+    st.session_state.juego_activo = False
 
 # Función para cambiar a la calculadora
 def cambiar_a_calculadora():
+    st.session_state.pagina_inicial = True
+    st.session_state.juego_activo = False
+
+# Función para manejar el juego
+def iniciar_juego():
     st.session_state.pagina_inicial = False
+    st.session_state.juego_activo = True
 
-# Página de presentación
-if st.session_state.pagina_inicial:
-    # Botón de menú en la esquina superior
-    with st.sidebar:
-        st.title("Menú")
-        if st.button("Sobre"):
-            st.session_state.show_sobre = not st.session_state.get('show_sobre', False)
-        if st.session_state.get('show_sobre', False):
-            st.write("### Sobre")
-            st.write("Descripción sobre la calculadora.")
+# Barra lateral
+with st.sidebar:
+    st.title("Menú")
+    if st.button("Calculadora", key="calculadora"):
+        cambiar_a_calculadora()
+    if st.button("Sobre", key="sobre"):
+        st.session_state.show_sobre = not st.session_state.get('show_sobre', False)
+    if st.session_state.get('show_sobre', False):
+        st.write("### Sobre")
+        st.write("Descripción sobre la calculadora.")
 
+    if st.button("Notas de Uso", key="notas"):
+        st.session_state.show_notas = not st.session_state.get('show_notas', False)
+    if st.session_state.get('show_notas', False):
+        st.write("### Notas de Uso")
+        st.write("Notas sobre cómo usar la calculadora.")
 
-        if st.button("Notas de Uso"):
-            st.session_state.show_notas = not st.session_state.get('show_notas', False)
-        if st.session_state.get('show_notas', False):
-            st.write("### Notas de Uso")
-            st.write("Notas sobre cómo usar la calculadora.")
+    if st.button("Ayuda", key="ayuda"):
+        st.session_state.show_ayuda = not st.session_state.get('show_ayuda', False)
+    if st.session_state.get('show_ayuda', False):
+        st.write("### Ayuda")
+        st.write("Para más información sobre la calculadora contactar con mail@gmail.com.")    
 
-        if st.button("Ayuda"):
-            st.session_state.show_ayuda = not st.session_state.get('show_ayuda', False)
-        if st.session_state.get('show_ayuda', False):
-            st.write("### Ayuda")
-            st.write("Para más información sobre la calculadora contactar con mail@gmail.com.")    
+    if st.button("Juega", key="juega"):
+        iniciar_juego()
 
-        if st.button("Juega"):
-            st.session_state.show_juega = not st.session_state.get('show_juega', False)
-        if st.session_state.get('show_juega', False):
-            st.write("### Juega")
-            st.write("¡Juega para ejercitar tus conocimientos!")    
+# Contenido principal de la calculadora
+if st.session_state.pagina_inicial and not st.session_state.juego_activo:
+    st.title(" ")
 
+# Contenido del juego
+elif st.session_state.juego_activo:
+    pantalla_juego()
 
 else:
     # Definiciones de funciones principales
@@ -68,15 +80,8 @@ else:
         st.write("### Multiplicación de Matrices")
         st.write("Esta funcionalidad está en desarrollo.")
 
-    # Sidebar con las funciones
-    st.sidebar.title("Funciones")
-    st.sidebar.button("Multiplicación de Matriz por Vector", on_click=matriz_vector_multiplicacion)
-    st.sidebar.button("Multiplicación de Matrices", on_click=matrices_multiplicacion)
-    # Agrega más botones para otras funciones según sea necesario
 
-    # Contenido principal de la calculadora
-    st.write("### Bienvenido a la Calculadora de Álgebra Lineal")
-    st.write("Seleccione una función en la barra lateral para comenzar.")
+
 
 # Definiciones de funciones principales
 def recibir_matriz_local(key_prefix="matriz"):
