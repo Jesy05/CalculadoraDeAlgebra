@@ -37,7 +37,7 @@ if st.session_state.pagina_inicial:
             st.write("Notas sobre cómo usar la calculadora.")
 
         if st.button("Ayuda"):
-            st.session_state.show_notas = not st.session_state.get('show_ayuda', False)
+            st.session_state.show_ayuda = not st.session_state.get('show_ayuda', False)
         if st.session_state.get('show_ayuda', False):
             st.write("### Ayuda")
             st.write("Para más información sobre la calculadora contactar con mail@gmail.com.")    
