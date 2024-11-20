@@ -8,24 +8,12 @@ from modulos.suma_resta_matrices import sumar_matrices, restar_matrices
 from modulos.suma_vectores import suma_vectores
 from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
 from modulos.recibir_matriz import recibir_matriz, recibir_vector
-from modulos.regla_de_cramer import cramer_regla
-from modulos.juega import pantalla_juego, reset_timer, start_timer
+from modulos.regla_de_cramer import resolver_sistema
+from modulos.juega import pantalla_juego
 
 # Inicializar las claves en st.session_state si no existen
 if 'pagina_inicial' not in st.session_state:
     st.session_state.pagina_inicial = True
-if 'juego_activo' not in st.session_state:
-    st.session_state.juego_activo = False
-if 'is_running' not in st.session_state:
-    st.session_state.is_running = False
-if 'time_left' not in st.session_state:
-    st.session_state.time_left = 60
-if 'current_question' not in st.session_state:
-    st.session_state.current_question = None
-if 'current_options' not in st.session_state:
-    st.session_state.current_options = None
-if 'current_answer' not in st.session_state:
-    st.session_state.current_answer = None
 
 # Función para cambiar a la calculadora
 def cambiar_a_calculadora():
@@ -161,7 +149,7 @@ def cramer_calculadora():
         st.write("Error: La matriz debe ser cuadrada y el tamaño debe coincidir con el vector.")
         return
 
-    soluciones = cramer_regla(matriz, vector)
+    soluciones = resolver_sistema(matriz, vector)
     if soluciones:
         st.write("Soluciones del sistema:")
         for i, solucion in enumerate(soluciones, start=1):
@@ -236,22 +224,6 @@ def restar_matrices(A, B):
         return None
     resultado = [[A[i][j] - B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
     return resultado
-
-def cramer_regla(matriz, vector):
-    import numpy as np
-    det_matriz = np.linalg.det(matriz)
-    if det_matriz == 0:
-        st.write("Error: La matriz no tiene inversa, por lo tanto, no se puede aplicar la regla de Cramer.")
-        return None
-
-    soluciones = []
-    for i in range(len(vector)):
-        matriz_modificada = np.copy(matriz)
-        matriz_modificada[:, i] = vector
-        det_modificada = np.linalg.det(matriz_modificada)
-        soluciones.append(det_modificada / det_matriz)
-
-    return soluciones
 
 def eliminacion_por_gauss(matriz):
     eliminacion_por_gauss_modulo(matriz)
