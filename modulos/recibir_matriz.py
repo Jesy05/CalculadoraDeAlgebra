@@ -20,4 +20,6 @@ def recibir_vector():
     for i in range(longitud):
         valor = st.number_input(f"Elemento {i+1}", format="%.2f")
         vector.append(valor)
+
+    return vector
     return vector
