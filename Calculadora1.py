@@ -51,7 +51,8 @@ with st.sidebar:
         "y conceptos relacionados con álgebra lineal."
         "Con una interfaz amigable y funcionalidades dinámicas, esta calculadora "
         "está diseñada tanto para estudiantes como para profesionales, "
-       " permitiendo resolver problemas y validar conceptos de manera eficiente")
+       " permitiendo resolver problemas y validar conceptos de manera eficiente"
+                "Autores: Jesy Gonzales, Alejandra Morales, Daysi Miranda")
 
                  
     if st.button("Notas de Uso", key="notas"):
@@ -59,9 +60,7 @@ with st.sidebar:
     if st.session_state.get('show_notas', False):
         st.write("### Notas de Uso")
         st.write("Notas sobre cómo usar la calculadora.")
-        st.write("•	Navegación: Selecciona la operación que necesitas desde el menú principal y sigue las instrucciones en pantalla."
-"•	Datos de Entrada: Ingresa correctamente las matrices, vectores o ecuaciones según el formato indicado."
-"•	Interpretación de Resultados: Los resultados incluyen procedimientos en algunos casos para una mejor comprensión.")
+        st.write("•	Navegación: Selecciona la operación que necesitas desde el menú principal y sigue las instrucciones en pantalla.•	Datos de Entrada: Ingresa correctamente las matrices, vectores o ecuaciones según el formato indicado.•	Interpretación de Resultados: Los resultados incluyen procedimientos en algunos casos para una mejor comprensión.")
 
     if st.button("Ayuda", key="ayuda"):
         st.session_state.show_ayuda = not st.session_state.get('show_ayuda', False)
