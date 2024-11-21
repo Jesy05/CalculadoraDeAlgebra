@@ -412,5 +412,35 @@ def main():
             matriz = recibir_matriz_local("matriz_escalonada")
             eliminacion_por_gauss(matriz)
 
+    if menu_principal ==  "Métodos Numéricos":
+       opcion = st.radio(
+        "Seleccione una operación:",
+        [
+            "Método de Falsa Posición",
+            "Método de la Secante",
+            "Método de Newton-Raphson",
+            "Método de Bisección",
+        ]
+    )
+    
+    if opcion == "Método de Falsa Posición":
+        st.write("### Método de Falsa Posición")
+        st.write("Esta funcionalidad está en desarrollo.")
+    
+    elif opcion == "Método de la Secante":
+        st.write("### Método de la Secante")
+        st.write("Esta funcionalidad está en desarrollo.")
+    
+    elif opcion == "Método de Newton-Raphson":
+        st.write("### Método de Newton-Raphson")
+        st.write("Esta funcionalidad está en desarrollo.")
+    
+    elif opcion == "Método de Bisección":
+        st.write("### Método de Bisección")
+        st.write("Esta funcionalidad está en desarrollo.")
+    
+         
+          
+
 if __name__ == "__main__":
     main()
