@@ -1,52 +1,73 @@
-# cramer_regla.py
-import streamlit as st
+from fractions import Fraction
 
-def determinante_3x3_sarrus(matriz):
-    """Calcula el determinante de una matriz 3x3 usando la regla de Sarrus."""
-    return (matriz[0][0] * matriz[1][1] * matriz[2][2] +
-            matriz[0][1] * matriz[1][2] * matriz[2][0] +
-            matriz[0][2] * matriz[1][0] * matriz[2][1] -
-            matriz[0][2] * matriz[1][1] * matriz[2][0] -
-            matriz[0][0] * matriz[1][2] * matriz[2][1] -
-            matriz[0][1] * matriz[1][0] * matriz[2][2])
+def calcular_determinante(matrix):
+    """Calcula el determinante de una matriz cuadrada."""
+    n = len(matrix)
+    if n == 2:
+        # Determinante para matriz 2x2
+        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+    elif n == 3:
+        # Determinante por el método de Sarrus para matriz 3x3
+        return (matrix[0][0] * matrix[1][1] * matrix[2][2] +
+                matrix[0][1] * matrix[1][2] * matrix[2][0] +
+                matrix[0][2] * matrix[1][0] * matrix[2][1]) - \
+               (matrix[0][2] * matrix[1][1] * matrix[2][0] +
+                matrix[0][0] * matrix[1][2] * matrix[2][1] +
+                matrix[0][1] * matrix[1][0] * matrix[2][2])
+    else:
+        # Determinante por cofactores para matrices mayores
+        det = 0
+        for c in range(n):
+            menor = obtener_menor(matrix, 0, c)
+            det += ((-1) ** c) * matrix[0][c] * calcular_determinante(menor)
+        return det
 
-def determinante_por_cofactores(matriz):
-    """Calcula el determinante de una matriz cuadrada de tamaño NxN usando cofactores."""
-    n = len(matriz)
-    if n == 3:
-        return determinante_3x3_sarrus(matriz)
-    elif n == 2:
-        return matriz[0][0] * matriz[1][1] - matriz[0][1] * matriz[1][0]
+def obtener_menor(matrix, i, j):
+    """Devuelve la matriz menor al eliminar la fila i y columna j."""
+    return [row[:j] + row[j+1:] for row in (matrix[:i] + matrix[i+1:])]
+
+def resolver_sistema(matrix, terms):
+    """Resuelve un sistema de ecuaciones lineales por la Regla de Cramer.
     
-    det = 0
-    for col in range(n):
-        submatriz = [fila[:col] + fila[col+1:] for fila in matriz[1:]]
-        cofactor = ((-1) ** col) * matriz[0][col] * determinante_por_cofactores(submatriz)
-        det += cofactor
-    return det
+    Args:
+        matrix (list): Matriz de coeficientes.
+        terms (list): Vector de términos independientes.
 
-def cramer_regla(matriz, vector):
-    """Implementa la regla de Cramer para resolver sistemas lineales Ax = b."""
-    n = len(matriz)
-    det_A = determinante_por_cofactores(matriz)
-    if det_A == 0:
-        st.write("El sistema no tiene solución única porque el determinante de la matriz es cero.")
-        return None
+    Returns:
+        dict: Resultados con las soluciones, determinantes, y pasos detallados.
+    """
+    n = len(matrix)
+    det_principal = calcular_determinante(matrix)
+
+    pasos = {
+        "det_principal": det_principal,
+        "detalles": []
+    }
+
+    if det_principal == 0:
+        return {
+            "soluciones": None,
+            "mensaje": "El sistema no tiene solución (determinante principal es 0).",
+            "pasos": pasos
+        }
 
     soluciones = []
-    st.write(f"Determinante de la matriz A: {det_A}")
     for i in range(n):
-        matriz_modificada = [fila[:] for fila in matriz]
-        for j in range(n):
-            matriz_modificada[j][i] = vector[j]
+        matriz_modificada = [row[:] for row in matrix]
+        for fila in range(n):
+            matriz_modificada[fila][i] = terms[fila]
 
-        det_Ai = determinante_por_cofactores(matriz_modificada)
-        solucion_i = det_Ai / det_A
-        soluciones.append(solucion_i)
+        det_i = calcular_determinante(matriz_modificada)
+        soluciones.append(Fraction(det_i, det_principal))
 
-        st.write(f"Matriz A con columna {i+1} reemplazada:")
-        st.write(matriz_modificada)
-        st.write(f"Determinante de la matriz A_{i+1}: {det_Ai}")
-        st.write(f"Solución para x_{i+1}: {solucion_i}")
+        pasos["detalles"].append({
+            "variable": f"x{i+1}",
+            "det_i": det_i,
+            "matriz_modificada": matriz_modificada,
+        })
 
-    return soluciones
+    return {
+        "soluciones": soluciones,
+        "mensaje": "El sistema tiene solución única.",
+        "pasos": pasos
+    }

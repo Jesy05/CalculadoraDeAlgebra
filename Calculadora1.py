@@ -8,46 +8,68 @@ from modulos.suma_resta_matrices import sumar_matrices, restar_matrices
 from modulos.suma_vectores import suma_vectores
 from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
 from modulos.recibir_matriz import recibir_matriz, recibir_vector
-from modulos.regla_de_cramer import cramer_regla
+from modulos.regla_de_cramer import resolver_sistema
+from modulos.juega import pantalla_juego
 
-# Inicializar la clave 'pagina_inicial' en st.session_state si no existe
+# Inicializar las claves en st.session_state si no existen
 if 'pagina_inicial' not in st.session_state:
     st.session_state.pagina_inicial = True
+if 'juego_activo' not in st.session_state:
+    st.session_state.juego_activo = False
+if 'is_running' not in st.session_state:
+    st.session_state.is_running = False
+if 'current_question' not in st.session_state:
+    st.session_state.current_question = None
+if 'current_options' not in st.session_state:
+    st.session_state.current_options = None
+if 'current_answer' not in st.session_state:
+    st.session_state.current_answer = None
 
 # Función para cambiar a la calculadora
 def cambiar_a_calculadora():
+    st.session_state.pagina_inicial = True
+    st.session_state.juego_activo = False
+
+# Función para manejar el juego
+def iniciar_juego():
     st.session_state.pagina_inicial = False
+    st.session_state.juego_activo = True
 
-# Página de presentación
-if st.session_state.pagina_inicial:
-    # Botón de menú en la esquina superior
-    with st.sidebar:
-        st.title("Menú")
-        if st.button("Sobre"):
-            st.session_state.show_sobre = not st.session_state.get('show_sobre', False)
-        if st.session_state.get('show_sobre', False):
-            st.write("### Sobre")
-            st.write("Descripción sobre la calculadora.")
+# Barra lateral
+with st.sidebar:
+    st.title("Menú")
+    if st.button("Calculadora", key="calculadora"):
+        cambiar_a_calculadora()
+    if st.button("Sobre", key="sobre"):
+        st.session_state.show_sobre = not st.session_state.get('show_sobre', False)
+    if st.session_state.get('show_sobre', False):
+        st.write("### Sobre")
+        st.write("Descripción sobre la calculadora.")
 
+    if st.button("Notas de Uso", key="notas"):
+        st.session_state.show_notas = not st.session_state.get('show_notas', False)
+    if st.session_state.get('show_notas', False):
+        st.write("### Notas de Uso")
+        st.write("Notas sobre cómo usar la calculadora.")
 
-        if st.button("Notas de Uso"):
-            st.session_state.show_notas = not st.session_state.get('show_notas', False)
-        if st.session_state.get('show_notas', False):
-            st.write("### Notas de Uso")
-            st.write("Notas sobre cómo usar la calculadora.")
+    if st.button("Ayuda", key="ayuda"):
+        st.session_state.show_ayuda = not st.session_state.get('show_ayuda', False)
+    if st.session_state.get('show_ayuda', False):
+        st.write("### Ayuda")
+        st.write("Para más información sobre la calculadora contactar con mail@gmail.com.")    
 
-        if st.button("Ayuda"):
-            st.session_state.show_ayuda = not st.session_state.get('show_ayuda', False)
-        if st.session_state.get('show_ayuda', False):
-            st.write("### Ayuda")
-            st.write("Para más información sobre la calculadora contactar con mail@gmail.com.")    
+    if st.button("Juega", key="juega"):
+        iniciar_juego()
 
-        if st.button("Juega"):
-            st.session_state.show_juega = not st.session_state.get('show_juega', False)
-        if st.session_state.get('show_juega', False):
-            st.write("### Juega")
-            st.write("¡Juega para ejercitar tus conocimientos!")    
+# Contenido principal de la calculadora
+if st.session_state.pagina_inicial and not st.session_state.juego_activo:
+    st.title(" ")
 
+# Contenido del juego
+elif st.session_state.juego_activo:
+    pantalla_juego()
+    for _ in range(100):
+        st.write("")  # Añadir espacio para separar visualmente el contenido
 
 else:
     # Definiciones de funciones principales
@@ -68,15 +90,6 @@ else:
         st.write("### Multiplicación de Matrices")
         st.write("Esta funcionalidad está en desarrollo.")
 
-    # Sidebar con las funciones
-    st.sidebar.title("Funciones")
-    st.sidebar.button("Multiplicación de Matriz por Vector", on_click=matriz_vector_multiplicacion)
-    st.sidebar.button("Multiplicación de Matrices", on_click=matrices_multiplicacion)
-    # Agrega más botones para otras funciones según sea necesario
-
-    # Contenido principal de la calculadora
-    st.write("### Bienvenido a la Calculadora de Álgebra Lineal")
-    st.write("Seleccione una función en la barra lateral para comenzar.")
 
 # Definiciones de funciones principales
 def recibir_matriz_local(key_prefix="matriz"):
@@ -136,21 +149,59 @@ def matriz_determinante():
     st.write("### Determinante de una Matriz")
     st.write("Esta funcionalidad está en desarrollo.")
 
+#MARCA 
+
+from modulos.regla_de_cramer import resolver_sistema  # Importa la función del módulo
+
 def cramer_calculadora():
     st.write("### Regla de Cramer")
     
-    matriz = recibir_matriz_local("matriz_cramer")
-    vector = recibir_vector_local("vector_cramer")
+    # Configurar la entrada de la matriz
+    st.write("Ingrese los coeficientes de la matriz y el vector aumentado:")
+    num_variables = st.selectbox("Número de variables", [2, 3, 4], index=0)
     
-    if len(matriz) != len(vector) or len(matriz) != len(matriz[0]):
-        st.write("Error: La matriz debe ser cuadrada y el tamaño debe coincidir con el vector.")
-        return
+    # Generar campos de entrada para la matriz y el vector
+    matriz = []
+    for i in range(num_variables):
+        fila = []
+        cols = st.columns(num_variables + 1)
+        for j in range(num_variables + 1):
+            placeholder = f"({i+1},{j+1})" if j < num_variables else f"(aumentada {i+1})"
+            valor = cols[j].text_input(placeholder, value="", key=f"cramer_cell_{i}_{j}")
+            fila.append(valor)
+        matriz.append(fila)
 
-    soluciones = cramer_regla(matriz, vector)
-    if soluciones:
-        st.write("Soluciones del sistema:")
-        for i, solucion in enumerate(soluciones, start=1):
-            st.write(f"x_{i} = {solucion}")
+    # Botón para resolver
+    if st.button("Resolver sistema"):
+        try:
+            # Procesar la entrada
+            coeficientes = [[int(cell) for cell in fila[:-1]] for fila in matriz]
+            terminos = [int(fila[-1]) for fila in matriz]
+
+            # Llamar a la función del módulo
+            resultado = resolver_sistema(coeficientes, terminos)
+
+            # Mostrar los resultados
+            if resultado["soluciones"] is None:
+                st.error(resultado["mensaje"])
+            else:
+                st.subheader("Soluciones del sistema:")
+                for i, solucion in enumerate(resultado["soluciones"]):
+                    st.write(f"x{i+1} = {solucion}")
+
+            # Mostrar pasos detallados
+            with st.expander("Pasos detallados"):
+                st.write(f"Determinante principal: {resultado['pasos']['det_principal']}")
+                for detalle in resultado["pasos"]["detalles"]:
+                    st.write(f"Determinante para {detalle['variable']}: {detalle['det_i']}")
+                    st.write("Matriz modificada:")
+                    st.table(detalle["matriz_modificada"])
+        except ValueError:
+            st.error("Por favor, ingrese valores numéricos válidos en todos los campos.")
+
+
+#MARCA 
+
 
 def suma_vectores():
     st.write("### Suma de Vectores")
