@@ -52,7 +52,7 @@ with st.sidebar:
         "Con una interfaz amigable y funcionalidades dinámicas, esta calculadora "
         "está diseñada tanto para estudiantes como para profesionales, "
        " permitiendo resolver problemas y validar conceptos de manera eficiente"
-                "Autores: Jesy Gonzales, Alejandra Morales, Daysi Miranda")
+                "    Autores: Jesy Gonzales, Alejandra Morales, Daysi Miranda")
 
                  
     if st.button("Notas de Uso", key="notas"):
