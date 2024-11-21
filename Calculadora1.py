@@ -9,6 +9,7 @@ from modulos.suma_vectores import suma_vectores
 from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
 from modulos.recibir_matriz import recibir_matriz, recibir_vector
 from modulos.regla_de_cramer import resolver_sistema
+from modulos.determinante import calcular_determinante, pasos_determinante
 from modulos.juega import pantalla_juego
 
 # Inicializar las claves en st.session_state si no existen
@@ -56,7 +57,7 @@ with st.sidebar:
         st.session_state.show_ayuda = not st.session_state.get('show_ayuda', False)
     if st.session_state.get('show_ayuda', False):
         st.write("### Ayuda")
-        st.write("Para más información sobre la calculadora contactar con mail@gmail.com.")    
+        st.write("Para más información sobre la calculadora contactar con amoralesl@uamv.edu.ni , dmirandao@uamv.edu.ni , jgonzalez@uamv.edu.ni.")    
 
     if st.button("Juega", key="juega"):
         iniciar_juego()
@@ -145,13 +146,46 @@ def transpuesta_simple():
     st.write("### Transposición Simple")
     st.write("Esta funcionalidad está en desarrollo.")
 
-def matriz_determinante():
-    st.write("### Determinante de una Matriz")
-    st.write("Esta funcionalidad está en desarrollo.")
+def determinante_calculadora():
+    st.write("### Cálculo de Determinante")
+    
+    # Configurar la entrada de la matriz
+    st.write("Ingrese los valores de la matriz:")
+    num_variables = st.selectbox("Tamaño de la matriz", [2, 3, 4], index=0)
 
-#MARCA 
+    # Generar campos de entrada para la matriz
+    matriz = []
+    for i in range(num_variables):
+        fila = []
+        cols = st.columns(num_variables)
+        for j in range(num_variables):
+            placeholder = f"({i+1},{j+1})"
+            valor = cols[j].text_input(placeholder, value="", key=f"det_cell_{i}_{j}")
+            fila.append(valor)
+        matriz.append(fila)
 
-from modulos.regla_de_cramer import resolver_sistema  # Importa la función del módulo
+    # Botón para calcular determinante
+    if st.button("Calcular determinante"):
+        try:
+            # Procesar la entrada
+            matriz_numerica = [[int(cell) for cell in fila] for fila in matriz]
+
+            # Llamar a la función del módulo
+            determinante = calcular_determinante(matriz_numerica)
+
+            # Mostrar el resultado
+            st.success(f"El determinante de la matriz es: {determinante}")
+
+            # Mostrar pasos detallados (solo para matrices 3x3 o mayores)
+            if num_variables >= 2:
+                with st.expander("Pasos detallados"):
+                    pasos = pasos_determinante(matriz_numerica)
+                    st.text_area("Pasos del cálculo:", pasos, height=200)
+        except ValueError:
+            st.error("Por favor, ingrese valores numéricos válidos en todos los campos.")
+        except Exception as e:
+            st.error(f"Error: {e}")
+
 
 def cramer_calculadora():
     st.write("### Regla de Cramer")
@@ -198,10 +232,6 @@ def cramer_calculadora():
                     st.table(detalle["matriz_modificada"])
         except ValueError:
             st.error("Por favor, ingrese valores numéricos válidos en todos los campos.")
-
-
-#MARCA 
-
 
 def suma_vectores():
     st.write("### Suma de Vectores")
@@ -302,7 +332,8 @@ def main():
         "Resolución de Sistemas de Ecuaciones",
         "Operaciones de Vectores",
         "Operaciones con Matrices",
-        "Transformaciones de Matrices"
+        "Transformaciones de Matrices",
+        "Métodos Numéricos"
     ])
 
     if menu_principal == "Resolución de Sistemas de Ecuaciones":
@@ -375,7 +406,7 @@ def main():
         elif opcion == "Transpuesta simple":
             transpuesta_simple()
         elif opcion == "Determinante":
-            matriz_determinante()
+            determinante_calculadora()
         elif opcion == "Matriz en forma escalonada":
             st.write("### Matriz en forma escalonada")
             matriz = recibir_matriz_local("matriz_escalonada")
