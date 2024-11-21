@@ -14,6 +14,16 @@ from modulos.juega import pantalla_juego
 # Inicializar las claves en st.session_state si no existen
 if 'pagina_inicial' not in st.session_state:
     st.session_state.pagina_inicial = True
+if 'juego_activo' not in st.session_state:
+    st.session_state.juego_activo = False
+if 'is_running' not in st.session_state:
+    st.session_state.is_running = False
+if 'current_question' not in st.session_state:
+    st.session_state.current_question = None
+if 'current_options' not in st.session_state:
+    st.session_state.current_options = None
+if 'current_answer' not in st.session_state:
+    st.session_state.current_answer = None
 
 # Función para cambiar a la calculadora
 def cambiar_a_calculadora():
@@ -139,21 +149,59 @@ def matriz_determinante():
     st.write("### Determinante de una Matriz")
     st.write("Esta funcionalidad está en desarrollo.")
 
+#MARCA 
+
+from modulos.regla_de_cramer import resolver_sistema  # Importa la función del módulo
+
 def cramer_calculadora():
     st.write("### Regla de Cramer")
     
-    matriz = recibir_matriz_local("matriz_cramer")
-    vector = recibir_vector_local("vector_cramer")
+    # Configurar la entrada de la matriz
+    st.write("Ingrese los coeficientes de la matriz y el vector aumentado:")
+    num_variables = st.selectbox("Número de variables", [2, 3, 4], index=0)
     
-    if len(matriz) != len(vector) or len(matriz) != len(matriz[0]):
-        st.write("Error: La matriz debe ser cuadrada y el tamaño debe coincidir con el vector.")
-        return
+    # Generar campos de entrada para la matriz y el vector
+    matriz = []
+    for i in range(num_variables):
+        fila = []
+        cols = st.columns(num_variables + 1)
+        for j in range(num_variables + 1):
+            placeholder = f"({i+1},{j+1})" if j < num_variables else f"(aumentada {i+1})"
+            valor = cols[j].text_input(placeholder, value="", key=f"cramer_cell_{i}_{j}")
+            fila.append(valor)
+        matriz.append(fila)
 
-    soluciones = resolver_sistema(matriz, vector)
-    if soluciones:
-        st.write("Soluciones del sistema:")
-        for i, solucion in enumerate(soluciones, start=1):
-            st.write(f"x_{i} = {solucion}")
+    # Botón para resolver
+    if st.button("Resolver sistema"):
+        try:
+            # Procesar la entrada
+            coeficientes = [[int(cell) for cell in fila[:-1]] for fila in matriz]
+            terminos = [int(fila[-1]) for fila in matriz]
+
+            # Llamar a la función del módulo
+            resultado = resolver_sistema(coeficientes, terminos)
+
+            # Mostrar los resultados
+            if resultado["soluciones"] is None:
+                st.error(resultado["mensaje"])
+            else:
+                st.subheader("Soluciones del sistema:")
+                for i, solucion in enumerate(resultado["soluciones"]):
+                    st.write(f"x{i+1} = {solucion}")
+
+            # Mostrar pasos detallados
+            with st.expander("Pasos detallados"):
+                st.write(f"Determinante principal: {resultado['pasos']['det_principal']}")
+                for detalle in resultado["pasos"]["detalles"]:
+                    st.write(f"Determinante para {detalle['variable']}: {detalle['det_i']}")
+                    st.write("Matriz modificada:")
+                    st.table(detalle["matriz_modificada"])
+        except ValueError:
+            st.error("Por favor, ingrese valores numéricos válidos en todos los campos.")
+
+
+#MARCA 
+
 
 def suma_vectores():
     st.write("### Suma de Vectores")
@@ -224,6 +272,22 @@ def restar_matrices(A, B):
         return None
     resultado = [[A[i][j] - B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
     return resultado
+
+def cramer_regla(matriz, vector):
+    import numpy as np
+    det_matriz = np.linalg.det(matriz)
+    if det_matriz == 0:
+        st.write("Error: La matriz no tiene inversa, por lo tanto, no se puede aplicar la regla de Cramer.")
+        return None
+
+    soluciones = []
+    for i in range(len(vector)):
+        matriz_modificada = np.copy(matriz)
+        matriz_modificada[:, i] = vector
+        det_modificada = np.linalg.det(matriz_modificada)
+        soluciones.append(det_modificada / det_matriz)
+
+    return soluciones
 
 def eliminacion_por_gauss(matriz):
     eliminacion_por_gauss_modulo(matriz)
