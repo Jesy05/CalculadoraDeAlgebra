@@ -64,14 +64,14 @@ with st.sidebar:
         st.session_state.show_sobre = not st.session_state.get('show_sobre', False)
     if st.session_state.get('show_sobre', False):
         st.write("### Sobre")
-        st.write("Descripción sobre la calculadora.")
-        st.write("La página web Calculadora de Álgebra Lineal ofrece una herramienta interactiva"
-        "ofrece una herramienta interactiva para resolver una amplia variedad de operaciones"
-        "y conceptos relacionados con álgebra lineal."
-        "Con una interfaz amigable y funcionalidades dinámicas, esta calculadora "
+        st.write("Descripción sobre la calculadora:")
+        st.write("La página web Calculadora de Álgebra Lineal, ofrece una herramienta interactiva "
+        " para resolver una amplia variedad de operaciones"
+        " y conceptos relacionados con álgebra lineal."
+        " Con una interfaz amigable y funcionalidades dinámicas, esta calculadora "
         "está diseñada tanto para estudiantes como para profesionales, "
-       " permitiendo resolver problemas y validar conceptos de manera eficiente"
-                "    Autores: Jesy Gonzales, Alejandra Morales, Daysi Miranda")
+       " permitiendo resolver problemas y validar conceptos de manera eficiente."
+                "    Autores: Jesy González, Alejandra Morales, Daysi Miranda")
 
                  
     if st.button("Notas de Uso", key="notas"):
