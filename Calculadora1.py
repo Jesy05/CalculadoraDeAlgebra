@@ -614,7 +614,7 @@ def multiplicar_matrices(A, B):
 def transpuesta_simple():
     st.write("### Traspuesta Simple") 
     # Título
-st.title('Calculadora de la Transpuesta de una Matriz')
+    st.title('Calculadora de la Transpuesta de una Matriz')
 
 # Función para calcular la transpuesta de una matriz
 def calcular_transpuesta(matriz):
