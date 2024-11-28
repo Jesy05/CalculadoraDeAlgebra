@@ -12,6 +12,13 @@ def print_matrix(matrix, operations):
         st.write("Operaciones realizadas:")
         st.write(operations[-1])
 
+def obtener_soluciones(matrix):
+    """Extrae y retorna las soluciones del sistema desde la matriz."""
+    soluciones = []
+    for row in matrix:
+        soluciones.append(row[-1])  # Última columna corresponde a los valores de las variables
+    return soluciones
+
 def eliminacion_por_gauss(matrix):
     """Realiza la eliminación de Gauss en la matriz dada."""
     rows = len(matrix)
@@ -48,4 +55,22 @@ def eliminacion_por_gauss(matrix):
                     operations.append(f"F{j+1} → F{j+1} - ({factor}) * F{i+1}")
                     print_matrix(matrix, operations)
 
+    st.write("La matriz se ha convertido a forma escalonada reducida:")
+    print_matrix(matrix, [])
+    
+    # Obtener y mostrar las soluciones
+    soluciones = obtener_soluciones(matrix)
+    st.success("Soluciones del sistema:")
+    for idx, sol in enumerate(soluciones):
+        st.write(f"x{idx + 1} = {sol:.2f}")
     return matrix
+
+# Ejemplo de uso con Streamlit
+st.title("Eliminación por Gauss")
+st.write("Introduce una matriz aumentada:")
+
+# Ejemplo de matriz aumentada
+matrix = [[10, -3, 36], [2, 5, -4]]  # Puedes personalizar esta matriz
+if st.button("Resolver"):
+    eliminacion_por_gauss(matrix)
+
