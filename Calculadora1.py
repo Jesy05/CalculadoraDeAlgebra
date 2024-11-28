@@ -15,6 +15,7 @@ from modulos.inversa import calcular_inversa_matriz, parsear_numero, calcular_de
 from modulos.graficos import pantalla_graficos
 from modulos.juega import pantalla_juego
 import fractions as frac
+import matplotlib.pyplot as plt
 
 # Inicializar las claves en st.session_state si no existen
 if 'pagina_inicial' not in st.session_state:
