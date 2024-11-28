@@ -1,5 +1,3 @@
-# forma_escalonada.py
-
 import streamlit as st
 
 def imprimir_matriz(matriz, operacion=""):
@@ -12,7 +10,8 @@ def imprimir_matriz(matriz, operacion=""):
 def encontrar_pivote(matriz, fila, columna):
     """Busca el pivote en la columna dada, comenzando en una fila específica."""
     num_filas = len(matriz)
-    while columna < len(matriz[0]):
+    num_columnas = len(matriz[0])
+    while columna < num_columnas:
         for i in range(fila, num_filas):
             if matriz[i][columna] != 0:
                 return i, columna
@@ -38,17 +37,26 @@ def sumar_filas(matriz, fuente, destino, escalar):
 def forma_escalonada(matriz):
     """Convierte la matriz en forma escalonada."""
     fila_pivote = 0
-    for columna in range(len(matriz[0]) - 1):
+    num_filas = len(matriz)
+    num_columnas = len(matriz[0])
+    
+    for columna in range(num_columnas - 1):
         pivote, columna_pivote = encontrar_pivote(matriz, fila_pivote, columna)
+        
         if pivote == -1:
             continue
-        intercambiar_filas(matriz, fila_pivote, pivote)
-        pivot_val = matriz[fila_pivote][columna_pivote]
-        if pivot_val != 1 and pivot_val != 0:
-            escalar_fila(matriz, fila_pivote, 1 / pivot_val)
-        for i in range(len(matriz)):
-            if i != fila_pivote and matriz[i][columna_pivote] != 0:
-                sumar_filas(matriz, fila_pivote, i, -matriz[i][columna_pivote])
+        
+        # Validación para asegurarse de que los índices son válidos
+        if pivote < num_filas and columna_pivote < num_columnas:
+            intercambiar_filas(matriz, fila_pivote, pivote)
+            pivot_val = matriz[fila_pivote][columna_pivote]
+            if pivot_val != 1 and pivot_val != 0:
+                escalar_fila(matriz, fila_pivote, 1 / pivot_val)  # Normalizamos el pivote a 1
+            # Eliminamos los valores debajo del pivote
+            for i in range(fila_pivote + 1, num_filas):
+                if matriz[i][columna_pivote] != 0:
+                    escalar = -matriz[i][columna_pivote] / matriz[fila_pivote][columna_pivote]
+                    sumar_filas(matriz, fila_pivote, i, escalar)
         fila_pivote += 1
 
 def imprimir_solucion(matriz):
@@ -96,3 +104,12 @@ def imprimir_solucion(matriz):
     st.write("Soluciones:")
     for ecuacion in ecuaciones:
         st.write(ecuacion)
+
+# Ejemplo de uso
+matriz = [
+    [-3, 4, 0],
+    [2, -1, 0]
+]
+
+forma_escalonada(matriz)
+imprimir_solucion(matriz)
