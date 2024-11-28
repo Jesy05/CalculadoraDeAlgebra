@@ -10,7 +10,9 @@ from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_d
 from modulos.recibir_matriz import recibir_matriz, recibir_vector
 from modulos.regla_de_cramer import resolver_sistema
 from modulos.determinante import calcular_determinante, pasos_determinante
+from modulos.multiplicacion_matrices import multiplicar_matrices
 from modulos.juega import pantalla_juego
+import fractions as frac
 
 # Inicializar las claves en st.session_state si no existen
 if 'pagina_inicial' not in st.session_state:
@@ -135,9 +137,86 @@ def matriz_vector_multiplicacion():
     st.write("Resultado de la multiplicación de matriz por vector:")
     st.write(resultado)
 
+#WORK IN PROGRESS
+
 def matrices_multiplicacion():
     st.write("### Multiplicación de Matrices")
-    st.write("Esta funcionalidad está en desarrollo.")
+    
+    # Configurar las dimensiones de las matrices
+    st.write("Ingrese las dimensiones de las matrices:")
+    col1, col2 = st.columns(2)
+    filas_A = col1.number_input("Filas de la matriz A", min_value=1, max_value=10, value=2)
+    columnas_A = col2.number_input("Columnas de la matriz A", min_value=1, max_value=10, value=2)
+    
+    col3, col4 = st.columns(2)
+    filas_B = col3.number_input("Filas de la matriz B", min_value=1, max_value=10, value=2)
+    columnas_B = col4.number_input("Columnas de la matriz B", min_value=1, max_value=10, value=2)
+    
+    # Validar la compatibilidad de dimensiones para la multiplicación
+    if columnas_A != filas_B:
+        st.warning("El número de columnas de la matriz A debe ser igual al número de filas de la matriz B.")
+        return
+
+    # Entradas para la matriz A
+    st.write("Ingrese los valores de la matriz A:")
+    matriz_A = []
+    for i in range(filas_A):
+        fila = []
+        cols = st.columns(columnas_A)
+        for j in range(columnas_A):
+            placeholder = f"A({i+1},{j+1})"
+            valor = cols[j].text_input(placeholder, value="", key=f"A_{i}_{j}")
+            fila.append(valor)
+        matriz_A.append(fila)
+
+    # Entradas para la matriz B
+    st.write("Ingrese los valores de la matriz B:")
+    matriz_B = []
+    for i in range(filas_B):
+        fila = []
+        cols = st.columns(columnas_B)
+        for j in range(columnas_B):
+            placeholder = f"B({i+1},{j+1})"
+            valor = cols[j].text_input(placeholder, value="", key=f"B_{i}_{j}")
+            fila.append(valor)
+        matriz_B.append(fila)
+
+    # Botón para calcular la multiplicación
+    if st.button("Multiplicar matrices"):
+        try:
+            # Procesar la entrada
+            matriz_A = [[float(cell) for cell in fila] for fila in matriz_A]
+            matriz_B = [[float(cell) for cell in fila] for fila in matriz_B]
+
+            # Llamar a la función del módulo para multiplicar
+            resultado = multiplicar_matrices(matriz_A, matriz_B)
+
+            # Mostrar los resultados
+            st.subheader("Resultado de la multiplicación:")
+            st.table(resultado)
+
+        except ValueError:
+            st.error("Por favor, ingrese valores numéricos válidos en todos los campos.")
+
+# Función para multiplicar matrices (puedes colocarla en otro archivo y llamarla aquí)
+def multiplicar_matrices(A, B):
+    filas_A, columnas_A = len(A), len(A[0])
+    filas_B, columnas_B = len(B), len(B[0])
+    
+    # Crear la matriz de resultado con ceros
+    resultado = [[0] * columnas_B for _ in range(filas_A)]
+    
+    # Realizar la multiplicación
+    for i in range(filas_A):
+        for j in range(columnas_B):
+            for k in range(columnas_A):
+                resultado[i][j] += A[i][k] * B[k][j]
+    
+    return resultado
+
+    
+
+#WORK IN PROGRESS
 
 def ejecutar_multiplicacion_matriz_por_vector(matriz, vector) -> list[int]:
     resultado = [sum(matriz[i][j] * vector[j] for j in range(len(vector))) for i in range(len(matriz))]
