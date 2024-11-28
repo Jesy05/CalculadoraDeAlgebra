@@ -14,7 +14,8 @@ from modulos.multiplicacion_matrices import multiplicar_matrices
 from modulos.inversa import calcular_inversa_matriz, parsear_numero, calcular_determinante, agregar_identidad, hacer_pivote
 from modulos.graficos import pantalla_graficos
 from modulos.verificar_traspuesta import verificar_propiedades_matrices, parsear_numero, transpuesta, verificar_propiedad_a_procedimiento,verificar_propiedad_b_procedimiento,verificar_propiedad_c_procedimiento,verificar_propiedad_d_procedimiento, suma_matrices, multiplicar_por_escalar,multiplicar_matrices
-from traspuesta_simple import calcular_transpuesta 
+from modulos.traspuesta_simple import calcular_transpuesta
+from modulos.multiplicacion_matriz_escalar import multiplicar_matriz_por_escalar 
 from modulos.juega import pantalla_juego
 import fractions as frac
 import matplotlib.pyplot as plt
@@ -300,13 +301,116 @@ def inversa():
         except ZeroDivisionError:
             st.error("No se puede dividir por cero durante el cálculo.")
 
+    # Funciones multiplicar matriz por escalar
+
+
+# Función principal
+def multiplicar_matriz_por_escalar():
+    st.write("### Multiplicación de una Matriz por un Escalar")
+
+    # Configurar el tamaño de la matriz
+    st.write("Ingrese las dimensiones de la matriz:")
+    filas = st.number_input("Número de filas:", min_value=1, max_value=10, value=3)
+    columnas = st.number_input("Número de columnas:", min_value=1, max_value=10, value=3)
+
+    # Inicializar la matriz
+    st.write("Ingrese los valores de la matriz:")
+    matriz = []
+    for i in range(filas):
+        fila = []
+        cols = st.columns(columnas)  # Dividir cada fila en columnas
+        for j in range(columnas):
+            # Cada celda tendrá un campo de texto
+            placeholder = f"Elemento ({i+1},{j+1})"
+            valor = cols[j].text_input(placeholder, value="", key=f"matriz_{i}_{j}")
+            # Intentamos convertir el valor ingresado a fracción o asignar 0 si no es válido
+            try:
+                if valor:
+                    valor = str(frac.Fraction(valor))  # Convertir a fracción
+                else:
+                    valor = "0"  # Si no se ingresa nada, asignamos 0
+            except ValueError:
+                st.warning(f"El valor ingresado en ({i+1},{j+1}) no es válido. Se tomará 0 como valor.")
+                valor = "0"
+            fila.append(valor)
+        matriz.append(fila)
+
+    # Entrada del escalar
+    st.write("Ingrese el escalar para multiplicar la matriz:")
+    escalar = st.text_input("Escalar (acepta fracciones y decimales):", value="1")
+
+    # Variables para almacenar los resultados y permitir interacción con los botones
+    matriz_resultante = None
+    mostrar_proc = False
+
+    # Botón para calcular la matriz resultante
+    if st.button('Multiplicar Matriz por Escalar'):
+        try:
+            # Procesar el escalar
+            escalar = frac.Fraction(escalar)
+
+            # Convertir la matriz a valores numéricos
+            matriz_numerica = [[frac.Fraction(valor) for valor in fila] for fila in matriz]
+
+            # Mostrar la matriz original
+            st.subheader('Matriz Original:')
+            mostrar_matriz(matriz_numerica)
+
+            # Calcular la matriz resultante
+            matriz_resultante = [
+                [elemento * escalar for elemento in fila] for fila in matriz_numerica
+            ]
+
+            # Mostrar la matriz resultante
+            st.subheader('Matriz Resultante:')
+            mostrar_matriz(matriz_resultante)
+
+            # Indicar que el procedimiento puede mostrarse
+            st.session_state["matriz_numerica"] = matriz_numerica
+            st.session_state["escalar"] = escalar
+            st.session_state["matriz_resultante"] = matriz_resultante
+            st.session_state["mostrar_proc"] = True
+
+        except ValueError as e:
+            st.error(f"Error: {e}. Asegúrese de ingresar valores válidos para la matriz y el escalar.")
+
+    # Botón para mostrar el procedimiento
+    if "mostrar_proc" in st.session_state and st.session_state["mostrar_proc"]:
+        if st.button('Mostrar Procedimiento'):
+            matriz_numerica = st.session_state["matriz_numerica"]
+            escalar = st.session_state["escalar"]
+            matriz_resultante = st.session_state["matriz_resultante"]
+
+            st.subheader('Procedimiento:')
+            mostrar_procedimiento(matriz_numerica, escalar, matriz_resultante)
+
+
+# Función para mostrar una matriz
+def mostrar_matriz(matriz):
+    """
+    Muestra una matriz en formato tabla en Streamlit.
+    """
+    st.table([[str(elem) for elem in fila] for fila in matriz])
+
+
+# Función para mostrar el procedimiento paso a paso
+def mostrar_procedimiento(matriz, escalar, matriz_resultante):
+    """
+    Muestra el procedimiento de la multiplicación paso a paso.
+    """
+    for i, fila in enumerate(matriz):
+        st.write(f"### Fila {i + 1}:")
+        pasos = []
+        for j, elemento in enumerate(fila):
+            pasos.append(f"{elemento} × {escalar} = {matriz_resultante[i][j]}")
+        st.write("  \n".join(pasos))  # Mostrar los pasos para cada fila
+#  ###    
+
 #WORK IN PROGRESS
 
 def propiedades_transpuesta():
     st.write("### Transposición con Verificación de Propiedades")
     def propiedades_transpuesta():
-
-    
 
     # Configurar el tamaño de la matriz
      st.write("Ingrese las dimensiones de la matriz cuadrada:")
@@ -897,6 +1001,9 @@ def main():
             st.write(resultado)
         elif opcion == "Multiplicación de matriz por vector":
             matriz_vector_multiplicacion()
+        
+
+            
         elif opcion == "Verificar propiedad A(u + v) = Au + Av":
             verificar_propiedad_distribucionalidad()
 
@@ -927,8 +1034,13 @@ def main():
         elif opcion == "Inversa de una matriz":
             inversa()
         elif opcion == "Multiplicación de matriz por escalar":
-            st.write("### Multiplicación de Matriz por Escalar")
-            st.subheader("en proceso:")         
+            st.write("###   ")
+    
+            multiplicar_matriz_por_escalar()
+            
+
+    
+                
 
     elif menu_principal == "Transformaciones de Matrices":
         opcion = st.radio("Seleccione una operación:", [
@@ -969,6 +1081,7 @@ def main():
     if opcion == "Método de Falsa Posición":
         st.write("### Método de Falsa Posición")
         st.write("Esta funcionalidad está en desarrollo.")
+
     
     elif opcion == "Método de la Secante":
         st.write("### Método de la Secante")
