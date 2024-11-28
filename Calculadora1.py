@@ -304,10 +304,11 @@ def inversa():
 def propiedades_transpuesta():
     st.write("### Transposición con Verificación de Propiedades")
     def propiedades_transpuesta():
-    st.write("### Transposición con Verificación de Propiedades")
+
+    
 
     # Configurar el tamaño de la matriz
-    st.write("Ingrese las dimensiones de la matriz cuadrada:")
+     st.write("Ingrese las dimensiones de la matriz cuadrada:")
     dimension = st.number_input(
         "Dimensión de la matriz (n x n):", min_value=2, max_value=10, value=2
     )
