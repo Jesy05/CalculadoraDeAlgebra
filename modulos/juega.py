@@ -1,6 +1,5 @@
 import streamlit as st
 import random
-import time
 
 # Preguntas de ejemplo basadas en las funciones de la calculadora
 PREGUNTAS = [

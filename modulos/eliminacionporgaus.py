@@ -2,6 +2,7 @@
 
 import streamlit as st
 
+
 def print_matrix(matrix, operations):
     """Muestra la matriz y la última operación realizada."""
     st.write("Matriz actual:")
