@@ -841,7 +841,8 @@ def main():
             "Suma de matrices",
             "Resta de matrices",
             "Multiplicación de matrices",
-            "Inversa de una matriz"
+            "Inversa de una matriz",
+            "Multiplicación de matriz por escalar"
         ])
         if opcion == "Suma de matrices":
             st.write("### Suma de Matrices")
@@ -861,6 +862,9 @@ def main():
             matrices_multiplicacion()
         elif opcion == "Inversa de una matriz":
             inversa()
+        elif opcion == "Multiplicación de matriz por escalar":
+            st.write("### Multiplicación de Matriz por Escalar")
+            st.subheader("en proceso:")         
 
     elif menu_principal == "Transformaciones de Matrices":
         opcion = st.radio("Seleccione una operación:", [
