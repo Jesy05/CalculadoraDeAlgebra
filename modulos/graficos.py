@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
-def _graficos():
+def pantalla_graficos():
     st.write("### Herramientas para Gráficas")
     st.write("Prepara datos para graficar funciones, vectores o matrices. Aquí puedes configurar las entradas iniciales.")
 
