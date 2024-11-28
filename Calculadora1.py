@@ -11,6 +11,7 @@ from modulos.recibir_matriz import recibir_matriz, recibir_vector
 from modulos.regla_de_cramer import resolver_sistema
 from modulos.determinante import calcular_determinante, pasos_determinante
 from modulos.multiplicacion_matrices import multiplicar_matrices
+from modulos.inversa import calcular_inversa_matriz, parsear_numero, calcular_determinante, agregar_identidad, hacer_pivote
 from modulos.juega import pantalla_juego
 import fractions as frac
 
@@ -137,7 +138,6 @@ def matriz_vector_multiplicacion():
     st.write("Resultado de la multiplicación de matriz por vector:")
     st.write(resultado)
 
-#WORK IN PROGRESS
 
 def matrices_multiplicacion():
     st.write("### Multiplicación de Matrices")
@@ -214,17 +214,66 @@ def multiplicar_matrices(A, B):
     
     return resultado
 
-    
-
-#WORK IN PROGRESS
 
 def ejecutar_multiplicacion_matriz_por_vector(matriz, vector) -> list[int]:
     resultado = [sum(matriz[i][j] * vector[j] for j in range(len(vector))) for i in range(len(matriz))]
     return resultado
 
-def inversa_matriz():
+#WORK IN PROGRESS
+
+def inversa():
     st.write("### Inversa de una Matriz")
-    st.write("Esta funcionalidad está en desarrollo.")
+    st.write("### Cálculo de la Matriz Inversa")
+
+    # Configurar el tamaño de la matriz
+    st.write("Ingrese las dimensiones de la matriz cuadrada:")
+    dimension = st.number_input(
+        "Dimensión de la matriz (n x n):", min_value=2, max_value=10, value=2
+    )
+
+    # Entradas para la matriz
+    st.write("Ingrese los valores de la matriz:")
+    matriz = []
+    for i in range(dimension):
+        fila = []
+        cols = st.columns(dimension)
+        for j in range(dimension):
+            placeholder = f"({i+1},{j+1})"
+            valor = cols[j].text_input(placeholder, value="", key=f"inversa_{i}_{j}")
+            fila.append(valor)
+        matriz.append(fila)
+
+    # Botón para calcular la inversa
+    if st.button("Calcular Inversa"):
+        try:
+            # Procesar la entrada
+            matriz = [[parsear_numero(cell) for cell in fila] for fila in matriz]
+            det = calcular_determinante(matriz)
+            
+            if det == 0:
+                st.error("La matriz no es invertible (determinante = 0).")
+            else:
+                st.success(f"Determinante: {det}")
+                # Crear matriz aumentada (A | I)
+                matriz_aumentada = agregar_identidad(matriz)
+
+                # Realizar las operaciones elementales para obtener la inversa
+                for i in range(dimension):
+                    hacer_pivote(matriz_aumentada, i, i)
+
+                # Extraer la parte derecha de la matriz aumentada como la inversa
+                inversa = [fila[dimension:] for fila in matriz_aumentada]
+                
+                # Mostrar la matriz inversa
+                st.subheader("Matriz Inversa (A^-1):")
+                st.table([[str(elem) for elem in fila] for fila in inversa])
+
+        except ValueError as e:
+            st.error(f"Error: {e}")
+        except ZeroDivisionError:
+            st.error("No se puede dividir por cero durante el cálculo.")
+
+#WORK IN PROGRESS
 
 def propiedades_transpuesta():
     st.write("### Transposición con Verificación de Propiedades")
@@ -480,7 +529,7 @@ def main():
         elif opcion == "Multiplicación de matrices":
             matrices_multiplicacion()
         elif opcion == "Inversa de una matriz":
-            inversa_matriz()
+            inversa()
 
     elif menu_principal == "Transformaciones de Matrices":
         opcion = st.radio("Seleccione una operación:", [
@@ -502,14 +551,21 @@ def main():
 
     if menu_principal ==  "Métodos Numéricos":
        opcion = st.radio(
-        "Seleccione una operación:",
+        "Seleccione una operación (Métodos cerrados):",
+        
         [
             "Método de Falsa Posición",
-            "Método de la Secante",
-            "Método de Newton-Raphson",
-            "Método de Bisección",
+            "Método de Bisecciónde",
         ]
     )
+    if menu_principal ==  "Métodos Numéricos":
+       opcion = st.radio(
+        "Seleccione una operación (Métodos abiertos):",
+        [
+            "Método de Newton-Raphson",
+            "Método la Secante",
+        ]
+    )   
     
     if opcion == "Método de Falsa Posición":
         st.write("### Método de Falsa Posición")
