@@ -10,7 +10,9 @@ from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_d
 from modulos.recibir_matriz import recibir_matriz, recibir_vector
 from modulos.regla_de_cramer import resolver_sistema
 from modulos.determinante import calcular_determinante, pasos_determinante
+from modulos.multiplicacion_matrices import multiplicacion_matrices
 from modulos.juega import pantalla_juego
+from fractions import Fraction
 
 # Inicializar las claves en st.session_state si no existen
 if 'pagina_inicial' not in st.session_state:
@@ -85,9 +87,30 @@ else:
     # Definiciones de funciones principales
     def matriz_vector_multiplicacion():
         st.write("### Multiplicación de Matriz por Vector")
-        matriz = recibir_matriz_local("matriz_vector")
+        matriz = recibir_matriz_local_v1("matriz_vector")
         vector = recibir_vector_local("vector_matriz")
         
+        if matriz is None or vector is None:
+            st.write("Error: La matriz o el vector no se han ingresado correctamente.")
+            return
+        if matriz is None or vector is None:
+            st.write("Error: La matriz o el vector no se han ingresado correctamente.")
+            return
+        if matriz is None or vector is None:
+            st.write("Error: La matriz o el vector no se han ingresado correctamente.")
+            return
+        if matriz is None or vector is None:
+            st.write("Error: La matriz o el vector no se han ingresado correctamente.")
+            return
+        if matriz is None or vector is None:
+            st.write("Error: La matriz o el vector no se han ingresado correctamente.")
+            return
+        if matriz is None or vector is None:
+            st.write("Error: La matriz o el vector no se han ingresado correctamente.")
+            return
+        if matriz is None or vector is None:
+            st.write("Error: La matriz o el vector no se han ingresado correctamente.")
+            return
         if len(matriz[0]) != len(vector):
             st.write("Error: El número de columnas de la matriz debe coincidir con el número de elementos en el vector.")
             return
@@ -96,13 +119,10 @@ else:
         st.write("Resultado de la multiplicación de matriz por vector:")
         st.write(resultado)
 
-    def matrices_multiplicacion():
-        st.write("### Multiplicación de Matrices")
-        st.write("Esta funcionalidad está en desarrollo.")
 
 
 # Definiciones de funciones principales
-def recibir_matriz_local(key_prefix="matriz"):
+def recibir_matriz_local_v1(key_prefix="matriz"):
     filas = st.number_input("Ingrese el número de filas:", min_value=1, step=1, key=f"{key_prefix}_filas")
     columnas = st.number_input("Ingrese el número de columnas:", min_value=1, step=1, key=f"{key_prefix}_columnas")
     matriz = []
@@ -127,7 +147,7 @@ def matriz_vector_multiplicacion():
     matriz = recibir_matriz_local("matriz_vector")
     vector = recibir_vector_local("vector_matriz")
     
-    if len(matriz[0]) != len(vector):
+    if len(matriz[0]) != len(vector): #type: ignore
         st.write("Error: El número de columnas de la matriz debe coincidir con el número de elementos en el vector.")
         return
 
@@ -135,9 +155,6 @@ def matriz_vector_multiplicacion():
     st.write("Resultado de la multiplicación de matriz por vector:")
     st.write(resultado)
 
-def matrices_multiplicacion():
-    st.write("### Multiplicación de Matrices")
-    st.write("Esta funcionalidad está en desarrollo.")
 
 def ejecutar_multiplicacion_matriz_por_vector(matriz, vector) -> list[int]:
     resultado = [sum(matriz[i][j] * vector[j] for j in range(len(vector))) for i in range(len(matriz))]
@@ -194,6 +211,38 @@ def determinante_calculadora():
             st.error("Por favor, ingrese valores numéricos válidos en todos los campos.")
         except Exception as e:
             st.error(f"Error: {e}")
+
+
+#WORK IN PROGRESS
+
+def multiplicar_matrices():
+    if st.button("Multiplicar matrices"):
+        multiplicar_matrices()
+    # Función para ingresar una matriz desde la entrada de Streamlit, con soporte para fracciones
+def recibir_matriz_local(key_prefix="matriz"):
+    filas = st.number_input("Ingrese el número de filas:", min_value=1, step=1, key=f"{key_prefix}_filas")
+    columnas = st.number_input("Ingrese el número de columnas:", min_value=1, step=1, key=f"{key_prefix}_columnas")
+    matriz = []
+    for i in range(filas):
+        fila = []
+        cols = st.columns(columnas)
+        for j in range(columnas):
+            valor = cols[j].text_input(f"Ingrese el valor para la posición ({i+1}, {j+1}):", key=f"{key_prefix}_{i}_{j}")
+            try:
+                # Convertir a fracción si es posible
+                if "/" in valor:
+                    fila.append(Fraction(valor))
+                elif valor:  # Si no es vacío, convertir a número
+                    fila.append(float(valor))
+                else:
+                    fila.append(0)  # Si está vacío, colocar 0 por defecto
+            except ValueError:
+                st.error(f"Entrada inválida en la posición ({i+1},{j+1}). Use números o fracciones como a/b.")
+                return None
+        matriz.append(fila)
+    return matriz
+
+#WORK IN PROGRESS 
 
 
 def cramer_calculadora():
@@ -278,6 +327,9 @@ def verificar_propiedad_distribucionalidad():
     vector_u = recibir_vector_local("vector_u")
     vector_v = recibir_vector_local("vector_v")
     
+    if matriz is None or vector_u is None or vector_v is None:
+        st.write("Error: La matriz o los vectores no se han ingresado correctamente.")
+        return
     if len(matriz[0]) != len(vector_u) or len(vector_u) != len(vector_v):
         st.write("Error: Las dimensiones de la matriz y los vectores no coinciden.")
         return
@@ -349,7 +401,7 @@ def main():
         opcion = st.radio("Seleccione una operación:", ["Eliminación por Gauss", "Regla de Cramer"])
         if opcion == "Eliminación por Gauss":
             st.write("### Eliminación por Gauss ")
-            matriz = recibir_matriz_local("matriz_gauss")
+            matriz = recibir_matriz_local_v1("matriz_gauss")
             eliminacion_por_gauss(matriz)
         elif opcion == "Regla de Cramer":
             cramer_calculadora()
@@ -386,20 +438,20 @@ def main():
         ])
         if opcion == "Suma de matrices":
             st.write("### Suma de Matrices")
-            A = recibir_matriz_local("matriz_suma_A")
-            B = recibir_matriz_local("matriz_suma_B")
+            A = recibir_matriz_local_v1("matriz_suma_A")
+            B = recibir_matriz_local_v1("matriz_suma_B")
             resultado = sumar_matrices(A, B)
             st.write("Resultado de la suma de matrices:")
             st.write(resultado)
         elif opcion == "Resta de matrices":
             st.write("### Resta de Matrices")
-            A = recibir_matriz_local("matriz_resta_A")
-            B = recibir_matriz_local("matriz_resta_B")
+            A = recibir_matriz_local_v1("matriz_resta_A")
+            B = recibir_matriz_local_v1("matriz_resta_B")
             resultado = restar_matrices(A, B)
             st.write("Resultado de la resta de matrices:")
             st.write(resultado)
         elif opcion == "Multiplicación de matrices":
-            matrices_multiplicacion()
+            multiplicacion_matrices()
         elif opcion == "Inversa de una matriz":
             inversa_matriz()
 
@@ -418,7 +470,7 @@ def main():
             determinante_calculadora()
         elif opcion == "Matriz en forma escalonada":
             st.write("### Matriz en forma escalonada")
-            matriz = recibir_matriz_local("matriz_escalonada")
+            matriz = recibir_matriz_local_v1("matriz_escalonada")
             eliminacion_por_gauss(matriz)
 
     if menu_principal ==  "Métodos Numéricos":
@@ -449,6 +501,10 @@ def main():
         st.write("Esta funcionalidad está en desarrollo.")
     
          
+          
+
+if __name__ == "__main__":
+    main()        
           
 
 if __name__ == "__main__":
