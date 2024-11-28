@@ -12,7 +12,7 @@ from modulos.regla_de_cramer import resolver_sistema
 from modulos.determinante import calcular_determinante, pasos_determinante
 from modulos.multiplicacion_matrices import multiplicar_matrices
 from modulos.inversa import calcular_inversa_matriz, parsear_numero, calcular_determinante, agregar_identidad, hacer_pivote
-from modulos.juega import pantalla_juego
+from modulos.verificar_traspuesta import verificar_propiedades_matrices, parsear_numero, transpuesta, verificar_propiedad_a_procedimiento,verificar_propiedad_b_procedimiento,verificar_propiedad_c_procedimiento,verificar_propiedad_d_procedimiento, suma_matrices, multiplicar_por_escalar,multiplicar_matrices
 import fractions as frac
 
 # Inicializar las claves en st.session_state si no existen
@@ -274,10 +274,160 @@ def inversa():
             st.error("No se puede dividir por cero durante el cálculo.")
 
 #WORK IN PROGRESS
-
 def propiedades_transpuesta():
     st.write("### Transposición con Verificación de Propiedades")
-    st.write("Esta funcionalidad está en desarrollo.")
+
+    # Configurar el tamaño de la matriz
+    st.write("Ingrese las dimensiones de la matriz cuadrada:")
+    dimension = st.number_input(
+        "Dimensión de la matriz (n x n):", min_value=2, max_value=10, value=2
+    )
+
+    # Entradas para la matriz
+    st.write("Ingrese los valores de la matriz:")
+    matriz = []
+    for i in range(dimension):
+        fila = []
+        cols = st.columns(dimension)
+        for j in range(dimension):
+            placeholder = f"({i+1},{j+1})"
+            valor = cols[j].text_input(placeholder, value="", key=f"matriz_{i}_{j}")
+            fila.append(valor)
+        matriz.append(fila)
+
+    # Botón para verificar propiedades
+    if st.button("Verificar Propiedades"):
+        try:
+            # Procesar la entrada
+            matriz = [[parsear_numero(cell) for cell in fila] for fila in matriz]
+
+            # Calcular la transpuesta de la matriz
+            matriz_transpuesta = transpuesta(matriz)
+
+            # Verificar las propiedades con detalles
+            verificar_a, detalle_a = verificar_propiedad_a(matriz, matriz_transpuesta, detalles=True)
+            verificar_b, detalle_b = verificar_propiedad_b(matriz, matriz_transpuesta, detalles=True)
+            verificar_c, detalle_c = verificar_propiedad_c(matriz, matriz_transpuesta, detalles=True)
+            verificar_d, detalle_d = verificar_propiedad_d(matriz, matriz_transpuesta, detalles=True)
+
+            # Mostrar resultados con procedimientos
+            st.write("### Resultados:")
+            if verificar_a:
+                st.success("(A^T)^T = A cumple.")
+            else:
+                st.error("(A^T)^T = A no cumple.")
+            st.text(detalle_a)
+
+            if verificar_b:
+                st.success("(A + B)^T = A^T + B^T cumple.")
+            else:
+                st.error("(A + B)^T = A^T + B^T no cumple.")
+            st.text(detalle_b)
+
+            if verificar_c:
+                st.success("(rA)^T = rA^T cumple.")
+            else:
+                st.error("(rA)^T = rA^T no cumple.")
+            st.text(detalle_c)
+
+            if verificar_d:
+                st.success("(AB)^T = B^T A^T cumple.")
+            else:
+                st.error("(AB)^T = B^T A^T no cumple.")
+            st.text(detalle_d)
+
+        except ValueError as e:
+            st.error(f"Error: {e}")
+        except ZeroDivisionError:
+            st.error("No se puede dividir por cero durante el cálculo.")
+
+# Funciones auxiliares actualizadas
+def parsear_numero(valor):
+    try:
+        if "/" in valor:
+            return frac.Fraction(valor)
+        elif "." in valor:
+            return float(valor)
+        else:
+            return int(valor)
+    except ValueError:
+        raise ValueError(f"El valor '{valor}' no es un número válido. Use enteros, decimales o fracciones (ej. 3/4).")
+
+def transpuesta(matriz):
+    return [[matriz[j][i] for j in range(len(matriz))] for i in range(len(matriz[0]))]
+
+def verificar_propiedad_a(A, _, detalles=False):
+    A_T_T = transpuesta(transpuesta(A))
+    detalle = f"Transpuesta doble:\n{A_T_T}\nOriginal:\n{A}"
+    return A == A_T_T, detalle if detalles else (A == A_T_T)
+
+def verificar_propiedad_b(A, A_T, detalles=False):
+    try:
+        suma_original = suma_matrices(A, A)
+        suma_transpuesta = transpuesta(suma_original)
+        suma_individual = suma_matrices(A_T, A_T)
+        detalle = (
+            f"Suma original:\n{suma_original}\n"
+            f"Transpuesta de la suma:\n{suma_transpuesta}\n"
+            f"Suma de transpuestas:\n{suma_individual}"
+        )
+        cumple = suma_transpuesta == suma_individual
+        return cumple, detalle if detalles else cumple
+    except ValueError:
+        return False, "Error al sumar matrices."
+
+def verificar_propiedad_c(A, A_T, detalles=False):
+    escalar = 2  # Ejemplo con r = 2
+    multiplicacion_original = multiplicar_por_escalar(A, escalar)
+    transpuesta_escalar = transpuesta(multiplicacion_original)
+    multiplicacion_transpuesta = multiplicar_por_escalar(A_T, escalar)
+    detalle = (
+        f"Multiplicación original:\n{multiplicacion_original}\n"
+        f"Transpuesta del resultado:\n{transpuesta_escalar}\n"
+        f"Resultado escalado de la transpuesta:\n{multiplicacion_transpuesta}"
+    )
+    cumple = transpuesta_escalar == multiplicacion_transpuesta
+    return cumple, detalle if detalles else cumple
+
+def verificar_propiedad_d(A, A_T, detalles=False):
+    try:
+        producto_original = multiplicar_matrices(A, A)
+        transpuesta_producto = transpuesta(producto_original)
+        producto_transpuestas = multiplicar_matrices(A_T, A_T)
+        detalle = (
+            f"Producto original:\n{producto_original}\n"
+            f"Transpuesta del producto:\n{transpuesta_producto}\n"
+            f"Producto de transpuestas:\n{producto_transpuestas}"
+        )
+        cumple = transpuesta_producto == producto_transpuestas
+        return cumple, detalle if detalles else cumple
+    except ValueError:
+        return False, "Error al multiplicar matrices."
+
+def suma_matrices(A, B):
+    if len(A) != len(B) or len(A[0]) != len(B[0]):
+        raise ValueError("Las matrices A y B no tienen las mismas dimensiones para la suma.")
+    return [[A[i][j] + B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
+
+def multiplicar_por_escalar(matriz, escalar):
+    return [[escalar * matriz[i][j] for j in range(len(matriz[0]))] for i in range(len(matriz))]
+
+def multiplicar_matrices(A, B):
+    if len(A[0]) != len(B):
+        raise ValueError("El número de columnas de A debe coincidir con el número de filas de B para multiplicar matrices.")
+    filas_A = len(A)
+    columnas_A = len(A[0])
+    columnas_B = len(B[0])
+    producto = [[0 for _ in range(columnas_B)] for _ in range(filas_A)]
+    for i in range(filas_A):
+        for j in range(columnas_B):
+            for k in range(columnas_A):
+                producto[i][j] += A[i][k] * B[k][j]
+    return producto
+
+
+
+    ####
 
 def transpuesta_simple():
     st.write("### Transposición Simple")
