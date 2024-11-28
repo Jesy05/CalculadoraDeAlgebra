@@ -611,8 +611,71 @@ def multiplicar_matrices(A, B):
 
 
 def transpuesta_simple():
-    st.write("### Transposición Simple")
-    st.write("Esta funcionalidad está en desarrollo.")
+    st.write("### Traspuesta Simple") 
+    # Título
+st.title('Calculadora de la Transpuesta de una Matriz')
+
+# Función para calcular la transpuesta de una matriz
+def calcular_transpuesta(matriz):
+    # La transpuesta es simplemente intercambiar filas y columnas
+    return [[matriz[j][i] for j in range(len(matriz))] for i in range(len(matriz[0]))]
+
+# Función para mostrar la matriz de manera organizada en un formato de cuadrícula
+def mostrar_matriz(matriz):
+    for fila in matriz:
+        st.write(" | ".join([str(elem) for elem in fila]))  # Imprime cada fila con los elementos separados por "|"
+
+# Función principal para la entrada de la matriz y transposición
+def transpuesta_simple():
+    st.write("### Traspuesta de una Matriz")
+
+    # Configurar el tamaño de la matriz
+    st.write("Ingrese las dimensiones de la matriz cuadrada:")
+    dimension = st.number_input("Dimensión de la matriz (n x n):", min_value=2, max_value=10, value=3)
+
+    # Inicializamos la matriz vacía con el tamaño especificado
+    st.write("Ingrese los valores de la matriz:")
+
+    matriz = []
+
+    # Mostramos la matriz vacía para que el usuario ingrese los datos
+    for i in range(dimension):
+        fila = []
+        cols = st.columns(dimension)  # Dividimos la fila en columnas
+        for j in range(dimension):
+            # Cada celda tendrá un campo de texto
+            placeholder = f"Elemento ({i+1},{j+1})"
+            valor = cols[j].text_input(placeholder, value="", key=f"matriz_{i}_{j}")
+            # Intentamos convertir a fracción si es posible
+            try:
+                if valor:
+                    valor = str(frac.Fraction(valor))  # Convertir a fracción
+                else:
+                    valor = "0"  # Si no se ingresa nada, asignamos 0
+            except ValueError:
+                st.warning(f"El valor ingresado en ({i+1},{j+1}) no es válido. Se tomará 0 como valor.")
+                valor = "0"  # Si no es fracción, asignamos 0
+            fila.append(valor)
+        matriz.append(fila)
+
+    # Botón para calcular la transpuesta
+    if st.button('Calcular Transpuesta'):
+        # Verificar si la matriz fue correctamente llena
+        if len(matriz) == dimension and all(len(fila) == dimension for fila in matriz):
+            # Mostrar la matriz original
+            st.subheader('Matriz Original:')
+            mostrar_matriz(matriz)
+
+            # Calcular la transpuesta de la matriz
+            matriz_transpuesta = calcular_transpuesta(matriz)
+
+            # Mostrar la matriz transpuesta
+            st.subheader('Matriz Transpuesta:')
+            mostrar_matriz(matriz_transpuesta)
+
+        else:
+            st.error("La matriz no está completamente llena o tiene dimensiones incorrectas.")
+    
 
 def determinante_calculadora():
     st.write("### Cálculo de Determinante")
