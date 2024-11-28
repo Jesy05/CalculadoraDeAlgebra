@@ -1,7 +1,5 @@
-# modulos/eliminacion_gauss.py
-
+#modulo/ eliminacion_Gauss
 import streamlit as st
-
 
 def print_matrix(matrix, operations):
     """Muestra la matriz y la última operación realizada."""
@@ -25,7 +23,12 @@ def eliminacion_por_gauss(matrix):
     cols = len(matrix[0])
     operations = []
 
-    for i in range(rows):
+    for i in range(min(rows, cols)):  # Aseguramos que no se salga de los límites
+        if i >= rows:
+            st.write(f"Error: El índice {i} excede el número de filas de la matriz.")
+            return None
+        
+        # Encontrar el pivote máximo para evitar división por 0 y mejorar la estabilidad
         max_row = i
         for k in range(i + 1, rows):
             if abs(matrix[k][i]) > abs(matrix[max_row][i]):
@@ -38,6 +41,8 @@ def eliminacion_por_gauss(matrix):
             print_matrix(matrix, operations)
 
         pivot = matrix[i][i]
+        
+        # Verificar que el pivote no sea cero
         if pivot == 0:
             st.error("La matriz es singular y no tiene solución única.")
             return None
@@ -47,6 +52,7 @@ def eliminacion_por_gauss(matrix):
             operations.append(f"F{i+1} / {pivot}")
             print_matrix(matrix, operations)
 
+        # Realizar la eliminación para otras filas
         for j in range(rows):
             if j != i:
                 factor = matrix[j][i]
