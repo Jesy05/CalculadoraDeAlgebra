@@ -1,3 +1,4 @@
+import math
 import re
 import streamlit as st
 import sympy as sp
@@ -1250,7 +1251,7 @@ def parse_function(func):
     """Prepara la función ingresada para ser evaluada."""
     func = func.replace("^", "**")  # Reemplaza el operador de potencia
     func = func.replace(" ", "")   # Elimina espacios
-    func = func.replace("sin", "math.sin") \
+    func = func.replace("sen", "math.sin") \
                .replace("cos", "math.cos") \
                .replace("tan", "math.tan") \
                .replace("log", "math.log") \
