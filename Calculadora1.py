@@ -21,6 +21,7 @@ from modulos.multiplicacion_matriz_escalar import multiplicar_matriz_por_escalar
 from modulos.sistema_ecuaciones import resolver_sistema, graficar_sistema
 from modulos.falsa_posicion import preparar_funcion, actualizar_funcion, falsa_posicion
 from modulos.metodo_secante import preparar_funcion, metodo_secante
+from modulos.metodo_biseccion import parse_function, eval_function, bisection_method
 from modulos.juega import pantalla_juego
 import fractions as frac
 import matplotlib.pyplot as plt
@@ -1242,6 +1243,100 @@ def interfaz_secante():
             st.error(f"Se produjo un error: {e}")
 
 #####
+#Método de biseccion
+
+# Función para procesar la expresión matemática
+def parse_function(func):
+    """Prepara la función ingresada para ser evaluada."""
+    func = func.replace("^", "**")  # Reemplaza el operador de potencia
+    func = func.replace(" ", "")   # Elimina espacios
+    func = func.replace("sin", "math.sin") \
+               .replace("cos", "math.cos") \
+               .replace("tan", "math.tan") \
+               .replace("log", "math.log") \
+               .replace("exp", "math.exp") \
+               .replace("e", str(math.exp(1)))  # Sustituye e por su valor numérico
+    func = ''.join([f'*{char}' if i > 0 and char.isalpha() and func[i-1].isdigit() else char 
+                    for i, char in enumerate(func)])
+    return func
+
+
+# Función para evaluar
+def eval_function(func, x):
+    """Evalúa la función en x usando eval. Asume que func está correctamente parseada."""
+    return eval(func)
+
+
+# Lógica del método de bisección
+def bisection_method(func, a, b, tol, max_iter=100):
+    results = []  # Almacena resultados de las iteraciones
+    func = parse_function(func)
+    fa = eval_function(func, a)
+    fb = eval_function(func, b)
+
+    if fa * fb > 0:
+        return None, "El intervalo no contiene una raíz (f(a) * f(b) > 0)."
+
+    xr_prev = a
+    for i in range(max_iter):
+        xr = (a + b) / 2
+        fc = eval_function(func, xr)
+        ea = abs(xr - xr_prev) if i > 0 else None
+
+        results.append({
+            "Iteración": i + 1,
+            "a": a,
+            "f(a)": fa,
+            "b": b,
+            "f(b)": fb,
+            "x_r": xr,
+            "f(x_r)": fc,
+            "Error Absoluto": ea
+        })
+
+        if abs(fc) < tol or (ea is not None and ea < tol):
+            return results, f"Raíz aproximada: {xr:.6f}, iteraciones: {i + 1}, error: {ea:.6f}" if ea else f"Raíz aproximada: {xr:.6f}, iteraciones: {i + 1}"
+
+        if fa * fc < 0:
+            b = xr
+            fb = fc
+        else:
+            a = xr
+            fa = fc
+
+        xr_prev = xr
+
+    return results, "El método no encontró una raíz en el número máximo de iteraciones."
+
+
+# Interfaz con Streamlit
+def bisection_interface():
+    st.title("Método de Bisección para Encontrar Raíces")
+
+    # Entrada de datos directamente en la interfaz principal
+    st.header("Ingrese los parámetros")
+    func = st.text_input("Función (en términos de x):", "x^3 - x - 2")
+    a = st.number_input("Intervalo inferior (a):", value=1.0)
+    b = st.number_input("Intervalo superior (b):", value=2.0)
+    tol = st.number_input("Tolerancia:", value=0.001, format="%.6f")
+    calcular = st.button("Calcular")
+
+    if calcular:
+        try:
+            results, summary = bisection_method(func, a, b, tol)
+
+            if results is None:
+                st.error(summary)
+            else:
+                st.success(summary)
+
+                # Mostrar resultados en una tabla
+                st.subheader("Resultados por Iteración")
+                st.table(results)
+
+        except Exception as e:
+            st.error(f"Error: {str(e)}")
+##
 
 # Función principal de la calculadora
 def main():
@@ -1392,7 +1487,7 @@ def main():
     
     elif opcion == "Método de Bisección":
         st.write("### Método de Bisección")
-        st.write("Esta funcionalidad está en desarrollo.")
+        bisection_interface()
     
          
           
