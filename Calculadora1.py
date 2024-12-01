@@ -20,6 +20,7 @@ from modulos.transpuesta_simple import calcular_transpuesta
 from modulos.multiplicacion_matriz_escalar import multiplicar_matriz_por_escalar 
 from modulos.sistema_ecuaciones import resolver_sistema, graficar_sistema
 from modulos.falsa_posicion import preparar_funcion, actualizar_funcion, falsa_posicion
+from modulos.metodo_secante import preparar_funcion, metodo_secante
 from modulos.juega import pantalla_juego
 import fractions as frac
 import matplotlib.pyplot as plt
@@ -1121,6 +1122,126 @@ def interfaz_falsa_posicion():
         except Exception as e:
             st.error(f"Ocurrió un error: {e}")
 
+#####
+
+#Método de la Secante
+
+# Función para convertir y preparar la función matemática
+def preparar_funcion(funcion):
+    funciones_math = {
+        'sen': 'sin',
+        'sin': 'sin',
+        'cos': 'cos',
+        'tan': 'tan',
+        'cot': '1/tan',
+        'sec': '1/cos',
+        'csc': '1/sin',
+        'log': 'log10',
+        'ln': 'log',
+        'exp': 'exp',
+        'sqrt': 'sqrt',
+        'pi': 'pi',
+        'e': 'E'
+    }
+    try:
+        funcion = funcion.replace('^', '**').replace(' ', '')
+        funcion = re.sub(r'(\d)([a-zA-Z])', r'\1*\2', funcion)
+        funcion = re.sub(r'(\))(?=\d|[a-zA-Z])', r')*', funcion)
+        for key, val in funciones_math.items():
+            funcion = re.sub(r'\b' + key + r'\b', val, funcion)
+        return funcion
+    except Exception as e:
+        raise ValueError(f"Error al procesar la función: {e}")
+
+# Método de la Secante
+def metodo_secante(funcion, x0, x1, tolerancia, max_iter):
+    resultados = []
+    f = sp.sympify(funcion)
+    x0, x1 = float(x0), float(x1)
+    ea = None  # Inicializamos el error aproximado
+
+    for i in range(max_iter):
+        y0 = f.subs('x', x0)
+        y1 = f.subs('x', x1)
+
+        if y1 - y0 == 0:
+            raise ZeroDivisionError("La división por cero ocurrió en el método de la secante.")
+
+        x2 = x1 - y1 * (x1 - x0) / (y1 - y0)
+        ea = abs((x2 - x1) / x2) * 100 if i > 0 else None
+        resultados.append([i + 1, x0, x1, x2, ea, y0, y1])
+
+        # Detener el método si el error aproximado es menor que la tolerancia
+        if ea is not None and ea < tolerancia:
+            break
+
+        x0, x1 = x1, x2
+
+    # Conclusión final
+    resultado_final = f"La raíz aproximada es {x2:.6f}, el error aproximado es {ea:.6f}%, el método converge a {i + 1} iteraciones."
+    return resultados, resultado_final
+
+# Interfaz de Streamlit
+def interfaz_secante():
+    st.title("Método de la Secante - Interfaz Adaptada")
+    st.markdown("Resuelve ecuaciones no lineales usando el **Método de la Secante**.")
+
+    # Entrada de la función
+    st.subheader("Función")
+    funcion = st.text_input("Ingrese la función f(x):", value="x^3 - 6*x^2 + 11*x - 6", placeholder="Ejemplo: x^3 - 6*x^2 + 11*x - 6")
+
+    # Opciones para intervalos
+    usar_intervalos = st.checkbox("¿Usar valores iniciales personalizados?", value=True)
+
+    # Entradas para los intervalos
+    st.subheader("Parámetros del Método")
+    col1, col2 = st.columns(2)
+    with col1:
+        x0 = st.text_input("Valor inicial x0:", value="1" if usar_intervalos else "")
+    with col2:
+        x1 = st.text_input("Valor inicial x1:", value="2" if usar_intervalos else "")
+
+    tolerancia = st.number_input("Tolerancia:", min_value=0.0, value=0.001, step=0.0001, format="%.6f")
+    max_iter = st.number_input("Máximo de iteraciones:", min_value=1, value=50, step=1)
+
+    # Botón para calcular
+    if st.button("Calcular"):
+        try:
+            # Validar y preparar la función
+            funcion_preparada = preparar_funcion(funcion)
+
+            # Validar intervalos
+            if usar_intervalos and (not x0 or not x1):
+                st.error("Por favor, complete ambos intervalos (x0 y x1).")
+                return
+
+            # Usar valores predeterminados si los intervalos no se usan
+            x0 = float(x0) if x0 else 1.0
+            x1 = float(x1) if x1 else 2.0
+
+            # Llamar al método de la Secante
+            resultados, resumen = metodo_secante(funcion_preparada, x0, x1, tolerancia, max_iter)
+
+            # Mostrar el resumen
+            st.success(resumen)
+
+            # Mostrar la tabla de resultados
+            st.subheader("Resultados por Iteración")
+            st.dataframe(
+                {
+                    "Iteración": [r[0] for r in resultados],
+                    "x0": [r[1] for r in resultados],
+                    "x1": [r[2] for r in resultados],
+                    "x2": [r[3] for r in resultados],
+                    "Error (%)": [r[4] for r in resultados],
+                    "f(x0)": [r[5] for r in resultados],
+                    "f(x1)": [r[6] for r in resultados],
+                }
+            )
+        except Exception as e:
+            st.error(f"Se produjo un error: {e}")
+
+#####
 
 # Función principal de la calculadora
 def main():
@@ -1260,13 +1381,11 @@ def main():
     if opcion == "Método de Falsa Posición":
         st.write("### Método de Falsa Posición")
         interfaz_falsa_posicion()
-
-        
     
     elif opcion == "Método de la Secante":
         st.write("### Método de la Secante")
-        st.write("Esta funcionalidad está en desarrollo.")
-    
+        interfaz_secante()
+
     elif opcion == "Método de Newton-Raphson":
         st.write("### Método de Newton-Raphson")
         st.write("Esta funcionalidad está en desarrollo.")
