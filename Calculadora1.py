@@ -783,7 +783,7 @@ def determinante_calculadora():
     
     # Configurar la entrada de la matriz
     st.write("Ingrese los valores de la matriz:")
-    num_variables = st.selectbox("Tamaño de la matriz", [2, 3, 4], index=0)
+    num_variables = st.slider("Tamaño de la matriz", min_value=2, max_value=10, value=2, step=1)
 
     # Generar campos de entrada para la matriz
     matriz = []
@@ -817,6 +817,7 @@ def determinante_calculadora():
             st.error("Por favor, ingrese valores numéricos válidos en todos los campos.")
         except Exception as e:
             st.error(f"Error: {e}")
+
 
 
 def cramer_calculadora():
