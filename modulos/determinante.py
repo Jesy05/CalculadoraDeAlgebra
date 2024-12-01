@@ -1,7 +1,7 @@
 from fractions import Fraction
 
 def calcular_determinante(matrix):
-    """Calcula el determinante de una matriz cuadrada."""
+    """Calcula el determinante de una matriz cuadrada de cualquier tamaño."""
     n = len(matrix)
     if n == 2:
         # Determinante para matriz 2x2
@@ -27,7 +27,7 @@ def obtener_menor(matrix, i, j):
     return [row[:j] + row[j+1:] for row in (matrix[:i] + matrix[i+1:])]
 
 def pasos_determinante(matrix):
-    """Genera los pasos detallados para calcular el determinante."""
+    """Genera los pasos detallados para calcular el determinante de cualquier tamaño."""
     pasos = "Pasos para calcular el determinante:\n"
     n = len(matrix)
 
@@ -41,6 +41,10 @@ def pasos_determinante(matrix):
         pasos += "Para matriz mayor, usando cofactores:\n"
         for c in range(len(matrix)):
             menor = obtener_menor(matrix, 0, c)
-            pasos += f"Menor eliminando fila 1 y columna {c+1}: {menor}, coeficiente: {matrix[0][c]}.\n"
+            pasos += f"Menor eliminando fila 1 y columna {c+1}: {formatear_matriz(menor)}, coeficiente: {matrix[0][c]}.\n"
 
     return pasos
+
+def formatear_matriz(matrix):
+    """Formatea una matriz como cadena para mostrarla en los pasos."""
+    return "[" + "; ".join(["[" + ", ".join(map(str, row)) + "]" for row in matrix]) + "]"
