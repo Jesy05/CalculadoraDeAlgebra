@@ -1246,6 +1246,7 @@ def interfaz_secante():
 #####
 #Método de biseccion
 
+
 # Función para procesar la expresión matemática
 def parse_function(func):
     """Prepara la función ingresada para ser evaluada."""
@@ -1320,11 +1321,12 @@ def bisection_interface():
     a = st.number_input("Intervalo inferior (a):", value=1.0)
     b = st.number_input("Intervalo superior (b):", value=2.0)
     tol = st.number_input("Tolerancia:", value=0.001, format="%.6f")
+    max_iter = st.number_input("Máximo de iteraciones:", value=100, step=1, min_value=1)
     calcular = st.button("Calcular")
 
     if calcular:
         try:
-            results, summary = bisection_method(func, a, b, tol)
+            results, summary = bisection_method(func, a, b, tol, max_iter)
 
             if results is None:
                 st.error(summary)
