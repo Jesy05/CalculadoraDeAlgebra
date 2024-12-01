@@ -16,7 +16,7 @@ from modulos.graficos import pantalla_graficos
 from modulos.verificar_traspuesta import verificar_propiedades_matrices, parsear_numero, transpuesta, verificar_propiedad_a_procedimiento,verificar_propiedad_b_procedimiento,verificar_propiedad_c_procedimiento,verificar_propiedad_d_procedimiento, suma_matrices, multiplicar_por_escalar,multiplicar_matrices
 from modulos.transpuesta_simple import calcular_transpuesta
 from modulos.multiplicacion_matriz_escalar import multiplicar_matriz_por_escalar 
-from modulos.sistemas_ecuaciones import resolver_sistema, graficar_sistema
+from modulos.sistema_ecuaciones import resolver_sistema, graficar_sistema
 from modulos.juega import pantalla_juego
 import fractions as frac
 import matplotlib.pyplot as plt
