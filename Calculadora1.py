@@ -1183,7 +1183,7 @@ def metodo_secante(funcion, x0, x1, tolerancia, max_iter):
 
 # Interfaz de Streamlit
 def interfaz_secante():
-    st.title("Método de la Secante - Interfaz Adaptada")
+    st.title("Método de la Secante")
     st.markdown("Resuelve ecuaciones no lineales usando el **Método de la Secante**.")
 
     # Entrada de la función
