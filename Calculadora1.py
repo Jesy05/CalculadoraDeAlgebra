@@ -16,6 +16,7 @@ from modulos.graficos import pantalla_graficos
 from modulos.verificar_traspuesta import verificar_propiedades_matrices, parsear_numero, transpuesta, verificar_propiedad_a_procedimiento,verificar_propiedad_b_procedimiento,verificar_propiedad_c_procedimiento,verificar_propiedad_d_procedimiento, suma_matrices, multiplicar_por_escalar,multiplicar_matrices
 from modulos.transpuesta_simple import calcular_transpuesta
 from modulos.multiplicacion_matriz_escalar import multiplicar_matriz_por_escalar 
+from modulos.sistemas_ecuaciones import resolver_sistema, graficar_sistema
 from modulos.juega import pantalla_juego
 import fractions as frac
 import matplotlib.pyplot as plt
@@ -947,6 +948,49 @@ def cramer_regla(matriz, vector):
 def eliminacion_por_gauss(matriz):
     eliminacion_por_gauss_modulo(matriz)
 
+ #Sistemas de ecuaciones 
+
+def sistema_ecuac():
+    # Configuración de la página
+    st.title("🧮 Resolución de Sistemas de Ecuaciones Lineales")
+    st.write("Este programa resuelve sistemas de ecuaciones lineales de la forma:")
+    st.latex("ra_1x + b_1y = c_1")
+    st.latex("ra_2x + b_2y = c_2")
+
+    # Entrada de datos
+    st.subheader("Ingresa los coeficientes del sistema")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        a1 = st.number_input("a1 (coeficiente de x en la primera ecuación)", value=1.0)
+        b1 = st.number_input("b1 (coeficiente de y en la primera ecuación)", value=1.0)
+        c1 = st.number_input("c1 (término independiente de la primera ecuación)", value=1.0)
+
+    with col2:
+        a2 = st.number_input("a2 (coeficiente de x en la segunda ecuación)", value=1.0)
+        b2 = st.number_input("b2 (coeficiente de y en la segunda ecuación)", value=1.0)
+        c2 = st.number_input("c2 (término independiente de la segunda ecuación)", value=1.0)
+
+    # Resolver el sistema
+    if st.button("Resolver sistema"):
+        tipo_solucion, solucion = resolver_sistema(a1, b1, c1, a2, b2, c2)
+
+        st.subheader("Resultado")
+        if tipo_solucion == "Única solución":
+            st.success(f"El sistema tiene una única solución: x = {solucion[0]:.2f}, y = {solucion[1]:.2f}")
+        elif tipo_solucion == "Infinitas soluciones":
+            st.info("El sistema tiene infinitas soluciones (las rectas son equivalentes).")
+        elif tipo_solucion == "Sin solución":
+            st.error("El sistema no tiene solución (las rectas son paralelas).")
+
+    # Botón para mostrar la gráfica
+    if st.button("Mostrar gráfica"):
+        st.subheader("Gráfica del sistema")
+        fig = graficar_sistema(a1, b1, c1, a2, b2, c2)
+        st.pyplot(fig)
+ ####      
+
 # Función principal de la calculadora
 def main():
     st.title("Calculadora de Álgebra Lineal")
@@ -962,13 +1006,18 @@ def main():
     ])
 
     if menu_principal == "Resolución de Sistemas de Ecuaciones":
-        opcion = st.radio("Seleccione una operación:", ["Eliminación por Gauss", "Regla de Cramer"])
+        opcion = st.radio("Seleccione una operación:", ["Eliminación por Gauss", "Regla de Cramer", "Sistemas de ecuaciones lineales"])
         if opcion == "Eliminación por Gauss":
             st.write("### Eliminación por Gauss ")
             matriz = recibir_matriz_local("matriz_gauss")
             eliminacion_por_gauss(matriz)
         elif opcion == "Regla de Cramer":
             cramer_calculadora()
+
+        elif opcion == "Sistemas de ecuaciones lineales":
+            st.write("###  ")
+            sistema_ecuac()
+
 
     elif menu_principal == "Operaciones de Vectores":
         opcion = st.radio("Seleccione una operación:", [
