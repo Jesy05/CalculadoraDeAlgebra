@@ -17,6 +17,7 @@ from modulos.verificar_traspuesta import verificar_propiedades_matrices, parsear
 from modulos.transpuesta_simple import calcular_transpuesta
 from modulos.multiplicacion_matriz_escalar import multiplicar_matriz_por_escalar 
 from modulos.sistema_ecuaciones import resolver_sistema, graficar_sistema
+from modulos.metodo_falsa_posicion import preparar_funcion, falsa_posicion, mostrar_resultados, limpiar_pantalla, calcular
 from modulos.juega import pantalla_juego
 import fractions as frac
 import matplotlib.pyplot as plt
@@ -990,6 +991,133 @@ def sistema_ecuac():
         fig = graficar_sistema(a1, b1, c1, a2, b2, c2)
         st.pyplot(fig)
  ####      
+
+#Método de la Falsa Posición 
+
+def preparar_funcion(funcion):
+    funciones_math = {
+        'sen': 'sin',
+        'sin': 'sin',
+        'cos': 'cos',
+        'tan': 'tan',
+        'cot': '1/tan',
+        'sec': '1/cos',
+        'csc': '1/sin',
+        'log': 'log10',
+        'ln': 'log',
+        'exp': 'exp',
+        'sqrt': 'sqrt',
+        'pi': 'pi',
+        'e': 'E'
+    }
+    try:
+        funcion = funcion.replace('^', '**').replace(' ', '')
+        funcion = re.sub(r'(\d)([a-zA-Z])', r'\1*\2', funcion)
+        funcion = re.sub(r'(\))(?=\d|[a-zA-Z])', r')*', funcion)
+        for key, val in funciones_math.items():
+            funcion = re.sub(r'\b' + key + r'\b', val, funcion)
+        return funcion
+    except Exception as e:
+        raise ValueError(f"Error al procesar la función: {e}")
+
+def falsa_posicion(funcion, xi, xu, tolerancia, max_iter):
+    resultados = []
+    f = sp.sympify(funcion)
+    xi, xu = float(xi), float(xu)
+    
+    # Inicialización de xr_ant
+    xr_ant = None
+    
+    for i in range(max_iter):
+        # Evaluar la función en los puntos xi, xu y en el valor xr
+        yi = f.subs('x', xi)
+        yu = f.subs('x', xu)
+        
+        # Calcular la raíz aproximada xr
+        xr = xu - (yu * (xi - xu)) / (yi - yu)
+        yr = f.subs('x', xr)
+        
+        # Calcular el error relativo respecto a la iteración anterior
+        ea = abs((xr - xi) / xr) * 100 if xr_ant is None else abs((xr - xr_ant) / xr) * 100
+        
+        # Guardar los resultados en la lista de resultados
+        resultados.append([i + 1, round(xi, 4), round(xu, 4), round(xr, 4), round(ea, 4) if ea else '', round(yi, 4), round(yu, 4), round(yr, 4)])
+        
+        # Verificar el criterio de detención basado en el error relativo entre iteraciones
+        if ea is not None and ea < tolerancia:
+            break
+        
+        # Actualizar el valor de xi o xu según el signo de f(x)
+        if yi * yr < 0:
+            xu = xr
+        else:
+            xi = xr
+        
+        # Actualizar xr_ant para la siguiente iteración
+        xr_ant = xr
+    
+    resultado_final = f"Raíz aproximada: {xr:.6f}, Error aproximado: {ea:.6f}%, Método converge en {i + 1} iteraciones."
+    return resultados, resultado_final
+
+# Mostrar resultados en la tabla
+def mostrar_resultados(resultados, columnas, resumen):
+    for widget in resultados_frame.winfo_children():
+        widget.destroy()
+    
+    tree = ttk.Treeview(resultados_frame, columns=columnas, show='headings')
+    for col in columnas:
+        tree.heading(col, text=col)
+        tree.column(col, anchor=CENTER)
+    for row in resultados:
+        tree.insert('', 'end', values=row)
+    tree.pack(expand=True, fill=BOTH)
+    
+    resultado_label.config(text=resumen)
+
+# Limpiar pantalla
+def limpiar_pantalla():
+    funcion_entry.delete(0, END)
+    xi_entry.delete(0, END)
+    xu_entry.delete(0, END)
+    tolerancia_entry.delete(0, END)
+    iteraciones_entry.delete(0, END)
+    for widget in resultados_frame.winfo_children():
+        widget.destroy()
+    resultado_label.config(text="")
+
+# Ejecutar el método seleccionado
+def calcular():
+    metodo = metodo_var.get()
+    funcion = funcion_entry.get()
+    try:
+        funcion = preparar_funcion(funcion)
+    except ValueError as e:
+        messagebox.showerror("Error", str(e))
+        return
+    
+    xi = xi_entry.get()
+    xu = xu_entry.get()
+    tol = tolerancia_entry.get()
+    max_iter = iteraciones_entry.get()
+    
+    if not funcion or not xi or not xu or not tol or not max_iter:
+        messagebox.showerror("Error", "Por favor, completa todos los campos.")
+        return
+    
+    try:
+        tol = float(tol)
+        max_iter = int(max_iter)
+        if metodo == "Falsa Posición":
+            resultados, resumen = falsa_posicion(funcion, xi, xu, tol, max_iter)
+            columnas = ['Iteración', 'xi', 'xu', 'xr', 'Ea', 'yi', 'yu', 'yr']
+        else:
+            messagebox.showinfo("Aviso", "Método no implementado.")
+            return
+        mostrar_resultados(resultados, columnas, resumen)
+    except Exception as e:
+        messagebox.showerror("Error", f"Se produjo un error: {e}")
+ 
+###
 
 # Función principal de la calculadora
 def main():
