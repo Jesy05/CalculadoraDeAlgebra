@@ -1,4 +1,6 @@
+import re
 import streamlit as st
+import sympy as sp
 from modulos.eliminacionporgaus import eliminacion_por_gauss as eliminacion_por_gauss_modulo
 from modulos.escalonada import forma_escalonada, imprimir_matriz, imprimir_solucion
 from modulos.multiplicacion_vectores import multiplicacion_de_vectores
@@ -17,6 +19,7 @@ from modulos.verificar_traspuesta import verificar_propiedades_matrices, parsear
 from modulos.transpuesta_simple import calcular_transpuesta
 from modulos.multiplicacion_matriz_escalar import multiplicar_matriz_por_escalar 
 from modulos.sistema_ecuaciones import resolver_sistema, graficar_sistema
+from modulos.falsa_posicion import preparar_funcion, actualizar_funcion, falsa_posicion
 from modulos.juega import pantalla_juego
 import fractions as frac
 import matplotlib.pyplot as plt
@@ -991,6 +994,134 @@ def sistema_ecuac():
         st.pyplot(fig)
  ####      
 
+##Método de la Falsa Posición
+
+# Función para convertir y preparar la función matemática
+def preparar_funcion(funcion):
+    funciones_math = {
+        'sen': 'sin',
+        'sin': 'sin',
+        'cos': 'cos',
+        'tan': 'tan',
+        'cot': '1/tan',
+        'sec': '1/cos',
+        'csc': '1/sin',
+        'log': 'log10',
+        'ln': 'log',
+        'exp': 'exp',
+        'sqrt': 'sqrt',
+        'pi': 'pi',
+        'e': 'E'
+    }
+    try:
+        funcion = funcion.replace('^', '**').replace(' ', '')
+        funcion = re.sub(r'(\d)([a-zA-Z])', r'\1*\2', funcion)
+        funcion = re.sub(r'(\))(?=\d|[a-zA-Z])', r')*', funcion)
+        for key, val in funciones_math.items():
+            funcion = re.sub(r'\b' + key + r'\b', val, funcion)
+        return funcion
+    except Exception as e:
+        raise ValueError(f"Error al procesar la función: {e}")
+
+# Interfaz en Streamlit
+def interfaz_falsa_posicion():
+    st.title("Método de Falsa Posición")
+    st.markdown(
+        """
+        Resuelve ecuaciones no lineales usando el **Método de Falsa Posición**.
+        Proporcione la función, los valores iniciales (`xi`, `xu`), la tolerancia y el máximo de iteraciones.
+        """
+    )
+
+    # Entrada de la función matemática
+    st.subheader("Ingrese la función")
+    if "funcion" not in st.session_state:
+        st.session_state["funcion"] = ""
+
+    funcion_str = st.text_input(
+        "Función (use 'x' como variable):", 
+        value=st.session_state["funcion"], 
+        placeholder="Ejemplo: x**3 - 6*x**2 + 11*x - 6"
+    )
+    st.session_state["funcion"] = funcion_str
+
+    # Entradas para parámetros del método
+    st.subheader("Parámetros del Método")
+    col1, col2 = st.columns(2)
+    with col1:
+        xi = st.number_input("Valor inicial xi:", format="%.4f", value=1.0)
+        tolerancia = st.number_input("Tolerancia (%):", format="%.4f", value=0.01)
+    with col2:
+        xu = st.number_input("Valor inicial xu:", format="%.4f", value=2.0)
+        max_iter = st.number_input("Máx. iteraciones:", min_value=1, value=50, step=1)
+
+    # Botón para calcular
+    if st.button("Calcular"):
+        try:
+            # Validación y preparación de la función
+            funcion = sp.sympify(preparar_funcion(funcion_str))
+            x = sp.symbols('x')
+
+            # Validación inicial
+            f_xi = funcion.subs(x, xi)
+            f_xu = funcion.subs(x, xu)
+            if f_xi * f_xu > 0:
+                st.error("La función no cambia de signo en el intervalo dado. Intente con otros valores de `xi` y `xu`.")
+                return
+
+            # Inicialización del método
+            iteracion = 0
+            xr_anterior = None
+            resultados = []
+
+            # Iteraciones del método
+            while iteracion < max_iter:
+                f_xi = funcion.subs(x, xi)
+                f_xu = funcion.subs(x, xu)
+                xr = xu - (f_xu * (xi - xu)) / (f_xi - f_xu)
+                f_xr = funcion.subs(x, xr)
+                ea = abs((xr - xr_anterior) / xr) * 100 if xr_anterior is not None else None
+
+                # Guardar resultados
+                resultados.append(
+                    {
+                        "Iteración": iteracion + 1,
+                        "xi": round(xi, 4),
+                        "xu": round(xu, 4),
+                        "xr": round(xr, 4),
+                        "Error (%)": round(ea, 4) if ea is not None else "-",
+                        "f(xi)": round(f_xi, 4),
+                        "f(xu)": round(f_xu, 4),
+                        "f(xr)": round(f_xr, 4),
+                    }
+                )
+
+                # Verificar convergencia
+                if ea is not None and ea < tolerancia:
+                    break
+
+                # Actualizar intervalos
+                if f_xi * f_xr < 0:
+                    xu = xr
+                else:
+                    xi = xr
+
+                xr_anterior = xr
+                iteracion += 1
+
+            # Mostrar resultados en tabla
+            st.subheader("Resultados por Iteración")
+            st.dataframe(resultados)
+
+            # Resumen final
+            st.success(f"Raíz aproximada: {xr:.6f}")
+            st.info(f"Error aproximado: {ea:.6f}%")
+            st.info(f"Método converge en {iteracion + 1} iteraciones.")
+
+        except Exception as e:
+            st.error(f"Ocurrió un error: {e}")
+
+
 # Función principal de la calculadora
 def main():
     st.title("Calculadora de Álgebra Lineal")
@@ -1128,7 +1259,9 @@ def main():
     # Dependiendo de la opción seleccionada, mostramos la descripción
     if opcion == "Método de Falsa Posición":
         st.write("### Método de Falsa Posición")
-        st.write("Esta funcionalidad está en desarrollo.")
+        interfaz_falsa_posicion()
+
+        
     
     elif opcion == "Método de la Secante":
         st.write("### Método de la Secante")
