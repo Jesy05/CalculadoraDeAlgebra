@@ -1098,28 +1098,37 @@ def main():
             matriz = recibir_matriz_local("matriz_escalonada")
             eliminacion_por_gauss(matriz)
 
-    if menu_principal ==  "Métodos Numéricos":
-       opcion = st.radio(
-        "Seleccione una operación (Métodos cerrados):",
-        
-        [
-            "Método de Falsa Posición",
-            "Método de Bisecciónde",
-        ]
+
+    if  menu_principal == "Métodos Numéricos":
+    # Primero, aseguramos que se selecciona un tipo de método
+     metodo_tipo = st.radio(
+        "Seleccione una categoría de métodos:",
+        ["Métodos Cerrados", "Métodos Abiertos"]
     )
-    if menu_principal ==  "Métodos Numéricos":
-       opcion = st.radio(
-        "Seleccione una operación (Métodos abiertos):",
-        [
-            "Método de Newton-Raphson",
-            "Método la Secante",
-        ]
-    )   
+
+    # Dependiendo de la selección de 'metodo_tipo', se muestran las opciones correspondientes
+     if metodo_tipo == "Métodos Cerrados":
+        opcion = st.radio(
+            "Seleccione una operación (Métodos Cerrados):",
+            [
+                "Método de Falsa Posición",
+                "Método de Bisección",
+            ]
+        )
     
+     elif metodo_tipo == "Métodos Abiertos":
+        opcion = st.radio(
+            "Seleccione una operación (Métodos Abiertos):",
+            [
+                "Método de Newton-Raphson",
+                "Método de la Secante",
+            ]
+        )
+    
+    # Dependiendo de la opción seleccionada, mostramos la descripción
     if opcion == "Método de Falsa Posición":
         st.write("### Método de Falsa Posición")
         st.write("Esta funcionalidad está en desarrollo.")
-
     
     elif opcion == "Método de la Secante":
         st.write("### Método de la Secante")
