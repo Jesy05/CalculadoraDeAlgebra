@@ -3,3 +3,5 @@ numpy
 pandas
 streamlit
 sympy
+math
+smath
