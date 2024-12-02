@@ -1129,118 +1129,123 @@ def interfaz_falsa_posicion():
 
 #Método de la Secante
 
+import streamlit as st
+import pandas as pd
+import sympy as sp
+import re
+
 # Función para convertir y preparar la función matemática
 def preparar_funcion(funcion):
+    """
+    Convierte una función matemática ingresada en formato natural a una expresión válida en SymPy.
+    Reconoce funciones matemáticas en mayúsculas y minúsculas.
+    """
     funciones_math = {
-        'sen': 'sin',
-        'sin': 'sin',
-        'cos': 'cos',
-        'tan': 'tan',
-        'cot': '1/tan',
-        'sec': '1/cos',
-        'csc': '1/sin',
-        'log': 'log10',
-        'ln': 'log',
-        'exp': 'exp',
-        'sqrt': 'sqrt',
-        'pi': 'pi',
-        'e': 'E'
+        'sen': 'sin', 'sin': 'sin',  # Seno
+        'cos': 'cos',  # Coseno
+        'tan': 'tan',  # Tangente
+        'cot': '1/tan',  # Cotangente
+        'sec': '1/cos',  # Secante
+        'csc': '1/sin',  # Cosecante
+        'log': 'log10',  # Logaritmo base 10
+        'ln': 'log',  # Logaritmo natural
+        'exp': 'exp',  # Exponencial
+        'sqrt': 'sqrt',  # Raíz cuadrada
+        'pi': 'pi',  # Pi
+        'e': 'E',  # Número de Euler
     }
+
     try:
-        funcion = funcion.replace('^', '**').replace(' ', '')
-        funcion = re.sub(r'(\d)([a-zA-Z])', r'\1*\2', funcion)
-        funcion = re.sub(r'(\))(?=\d|[a-zA-Z])', r')*', funcion)
+        # Convertir toda la función a minúsculas para uniformidad
+        funcion = funcion.lower()
+        
+        # Reemplazar potencias (^) por el operador SymPy (**)
+        funcion = funcion.replace("^", "**").replace(' ', '')
+
+        # Insertar multiplicaciones implícitas (e.g., 2x -> 2*x)
+        funcion = re.sub(r'(\d)([a-zA-Z])', r'\1*\2', funcion)  # Número seguido de letra
+        funcion = re.sub(r'(\))(?=\d|[a-zA-Z])', r')*', funcion)  # Paréntesis seguido de letra/número
+
+        # Reemplazar funciones trigonométricas y matemáticas
         for key, val in funciones_math.items():
-            funcion = re.sub(r'\b' + key + r'\b', val, funcion)
+            funcion = re.sub(r'\b' + key + r'\b', val, funcion)  # Reemplazo por su equivalente en SymPy
+
         return funcion
     except Exception as e:
         raise ValueError(f"Error al procesar la función: {e}")
 
 # Método de la Secante
 def metodo_secante(funcion, x0, x1, tolerancia, max_iter):
-    resultados = []
-    f = sp.sympify(funcion)
-    x0, x1 = float(x0), float(x1)
-    ea = None  # Inicializamos el error aproximado
+    """
+    Implementación del método de la Secante para encontrar raíces.
+    """
+    resultados = []  # Lista para almacenar resultados de cada iteración
+    f = sp.sympify(funcion)  # Convertir función a expresión simbólica
+    x0, x1 = float(x0), float(x1)  # Asegurar que los valores iniciales sean flotantes
+    ea = None  # Inicializar error relativo aproximado como None
 
     for i in range(max_iter):
-        y0 = f.subs('x', x0)
-        y1 = f.subs('x', x1)
+        y0 = f.subs('x', x0)  # Evaluar f(x0)
+        y1 = f.subs('x', x1)  # Evaluar f(x1)
 
+        # Verificar si ocurre división por cero
         if y1 - y0 == 0:
             raise ZeroDivisionError("La división por cero ocurrió en el método de la secante.")
 
+        # Calcular el siguiente valor x2
         x2 = x1 - y1 * (x1 - x0) / (y1 - y0)
-        ea = abs((x2 - x1) / x2) * 100 if i > 0 else None
-        resultados.append([i + 1, x0, x1, x2, ea, y0, y1])
+        ea = abs((x2 - x1) / x2) * 100 if i > 0 else None  # Calcular error relativo aproximado
 
-        # Detener el método si el error aproximado es menor que la tolerancia
+        # Guardar resultados de la iteración
+        resultados.append([i + 1, round(x0, 6), round(x1, 6), round(x2, 6), round(ea, 6) if ea else '-', round(y0, 6), round(y1, 6)])
+
+        # Verificar si el error está dentro de la tolerancia
         if ea is not None and ea < tolerancia:
             break
 
+        # Actualizar valores para la siguiente iteración
         x0, x1 = x1, x2
 
-    # Conclusión final
+    # Mensaje final de conclusión
     resultado_final = f"La raíz aproximada es {x2:.6f}, el error aproximado es {ea:.6f}%, el método converge a {i + 1} iteraciones."
     return resultados, resultado_final
 
 # Interfaz de Streamlit
 def interfaz_secante():
     st.title("Método de la Secante")
-    st.markdown("Resuelve ecuaciones no lineales usando el **Método de la Secante**.")
+    st.markdown("""
+    Resuelve ecuaciones no lineales usando el **Método de la Secante**.
+    Ingresa la función y los parámetros necesarios para encontrar la raíz.
+    """)
 
-    # Entrada de la función
-    st.subheader("Función")
-    funcion = st.text_input("Ingrese la función f(x):", value="x^3 - 6*x^2 + 11*x - 6", placeholder="Ejemplo: x^3 - 6*x^2 + 11*x - 6")
+    # Entrada de datos
+    st.sidebar.header("Parámetros de Entrada")
+    funcion = st.sidebar.text_input("Función (usa 'x' como variable):", value="x^3 - 6x^2 + 11x - 6")
+    x0 = st.sidebar.text_input("Valor inicial x0:", value="1")
+    x1 = st.sidebar.text_input("Valor inicial x1:", value="2")
+    tolerancia = st.sidebar.number_input("Tolerancia (%):", min_value=0.0, value=0.001, step=0.0001, format="%.6f")
+    max_iter = st.sidebar.number_input("Máximo de Iteraciones:", min_value=1, value=50, step=1)
 
-    # Opciones para intervalos
-    usar_intervalos = st.checkbox("¿Usar valores iniciales personalizados?", value=True)
-
-    # Entradas para los intervalos
-    st.subheader("Parámetros del Método")
-    col1, col2 = st.columns(2)
-    with col1:
-        x0 = st.text_input("Valor inicial x0:", value="1" if usar_intervalos else "")
-    with col2:
-        x1 = st.text_input("Valor inicial x1:", value="2" if usar_intervalos else "")
-
-    tolerancia = st.number_input("Tolerancia:", min_value=0.0, value=0.001, step=0.0001, format="%.6f")
-    max_iter = st.number_input("Máximo de iteraciones:", min_value=1, value=50, step=1)
-
-    # Botón para calcular
-    if st.button("Calcular"):
+    # Botón de cálculo
+    if st.sidebar.button("Calcular"):
         try:
-            # Validar y preparar la función
+            # Preparar función
             funcion_preparada = preparar_funcion(funcion)
 
-            # Validar intervalos
-            if usar_intervalos and (not x0 or not x1):
-                st.error("Por favor, complete ambos intervalos (x0 y x1).")
-                return
+            # Validar y convertir valores iniciales
+            x0, x1 = float(x0), float(x1)
 
-            # Usar valores predeterminados si los intervalos no se usan
-            x0 = float(x0) if x0 else 1.0
-            x1 = float(x1) if x1 else 2.0
-
-            # Llamar al método de la Secante
+            # Calcular resultados
             resultados, resumen = metodo_secante(funcion_preparada, x0, x1, tolerancia, max_iter)
-
-            # Mostrar el resumen
             st.success(resumen)
 
-            # Mostrar la tabla de resultados
+            # Mostrar tabla de resultados
             st.subheader("Resultados por Iteración")
-            st.dataframe(
-                {
-                    "Iteración": [r[0] for r in resultados],
-                    "x0": [r[1] for r in resultados],
-                    "x1": [r[2] for r in resultados],
-                    "x2": [r[3] for r in resultados],
-                    "Error (%)": [r[4] for r in resultados],
-                    "f(x0)": [r[5] for r in resultados],
-                    "f(x1)": [r[6] for r in resultados],
-                }
-            )
+            df_resultados = pd.DataFrame(resultados, columns=["Iteración", "x0", "x1", "x2", "Error (%)", "f(x0)", "f(x1)"])
+            st.dataframe(df_resultados)
+
+        except ZeroDivisionError as zde:
+            st.error(f"Error: {zde}")
         except Exception as e:
             st.error(f"Se produjo un error: {e}")
 
