@@ -29,129 +29,75 @@ def preparar_funcion(funcion):
     except Exception as e:
         raise ValueError(f"Error al procesar la función: {e}")
 
-# Función para actualizar la entrada de la función con los botones
-def actualizar_funcion(simbolo):
-    if "funcion" not in st.session_state:
-        st.session_state["funcion"] = ""
-    # Concatenar el símbolo al final de la función actual
-    st.session_state["funcion"] += simbolo
+# Método de Falsa Posición
+def falsa_posicion(funcion, xi, xu, tolerancia, max_iter):
+    resultados = []
+    f = sp.sympify(funcion)
+    xi, xu = float(xi), float(xu)
+    
+    # Inicialización de xr_ant
+    xr_ant = None
+    
+    for i in range(max_iter):
+        # Evaluar la función en los puntos xi, xu y en el valor xr
+        yi = f.subs('x', xi)
+        yu = f.subs('x', xu)
+        
+        # Calcular la raíz aproximada xr
+        xr = xu - (yu * (xi - xu)) / (yi - yu)
+        yr = f.subs('x', xr)
+        
+        # Calcular el error relativo respecto a la iteración anterior
+        ea = abs((xr - xi) / xr) * 100 if xr_ant is None else abs((xr - xr_ant) / xr) * 100
+        
+        # Guardar los resultados en la lista de resultados
+        resultados.append([i + 1, round(xi, 4), round(xu, 4), round(xr, 4), round(ea, 4) if ea else '', round(yi, 4), round(yu, 4), round(yr, 4)])
+        
+        # Verificar el criterio de detención basado en el error relativo entre iteraciones
+        if ea is not None and ea < tolerancia:
+            break
+        
+        # Actualizar el valor de xi o xu según el signo de f(x)
+        if yi * yr < 0:
+            xu = xr
+        else:
+            xi = xr
+        
+        # Actualizar xr_ant para la siguiente iteración
+        xr_ant = xr
+    
+    resultado_final = f"Raíz aproximada: {xr:.6f}, Error aproximado: {ea:.6f}%, Método converge en {i + 1} iteraciones."
+    return resultados, resultado_final
 
-# Función principal
-def falsa_posicion():
-    st.title("Método de Falsa Posición")
+# Interfaz de usuario en Streamlit
+st.title("Métodos Numéricos - Falsa Posición")
 
-    # Inicializar variable dinámica para la entrada de la función si no existe
-    if "funcion" not in st.session_state:
-        st.session_state["funcion"] = ""
+# Entradas
+funcion = st.text_input("Función (con 'x' como variable):")
+xi = st.text_input("xi:")
+xu = st.text_input("xu:")
+tolerancia = st.text_input("Tolerancia (%):")
+max_iter = st.text_input("Máx. Iteraciones:")
 
-    # Mostrar panel de botones interactivos
-    st.subheader("Panel de Símbolos y Funciones")
-
-    # Botones organizados en una matriz
-    botones = [
-        ["sen", "cos", "tan", "log", "ln"],
-        ["+F", "-", "*", "/", "^"],
-        ["raiz^2", "pi", "e", "(", ")"]
-    ]
-
-
-
-    # Generar botones en forma de cuadrícula
-    for fila in botones:
-        cols = st.columns(len(fila))  # Crear columnas dinámicamente
-        for i, simbolo in enumerate(fila):
-            with cols[i]:
-                st.button(simbolo, on_click=lambda s=simbolo: actualizar_funcion(s))
-
-    # Sincronizar el cuadro de texto con el estado de la sesión
-    funcion_str = st.text_input(
-        "Ingrese la función f(x):",
-        value=st.session_state["funcion"],
-        key="funcion_input",
-        placeholder="Escriba aquí su función",
-    )
-
-    # Verificar si se modificó manualmente el cuadro de texto
-    if funcion_str != st.session_state["funcion"]:
-        st.session_state["funcion"] = funcion_str  # Actualizar el estado dinámico
-
-    # Campos de entrada adicionales
-    xi = st.number_input("Ingrese el valor de xi:", format="%.4f")
-    xu = st.number_input("Ingrese el valor de xu:", format="%.4f")
-    tolerancia = st.number_input("Ingrese la tolerancia (%):", value=0.01, step=0.01, format="%.4f")
-    max_iter = st.number_input("Máximo de iteraciones:", min_value=1, value=50, step=1)
-
-    if st.button("Calcular"):
+# Calcular cuando el usuario presiona el botón
+if st.button("Calcular"):
+    if not funcion or not xi or not xu or not tolerancia or not max_iter:
+        st.error("Por favor, completa todos los campos.")
+    else:
         try:
-            # Convertir la función ingresada
-            funcion = sp.sympify(preparar_funcion(st.session_state["funcion"]))
-            x = sp.symbols('x')
-
-            # Validación inicial
-            f_xi = funcion.subs(x, xi)
-            f_xu = funcion.subs(x, xu)
-            if f_xi * f_xu > 0:
-                st.error("La función no cambia de signo en el intervalo dado. Intente con otros valores de xi y xu.")
-                return
-
-            # Inicialización
-            iteracion = 0
-            xr_anterior = None
-            resultados = []
-
-            # Iteraciones del método
-            while iteracion < max_iter:
-                f_xi = funcion.subs(x, xi)
-                f_xu = funcion.subs(x, xu)
-                
-                # Calcular xr y f(xr)
-                xr = xu - (f_xu * (xi - xu)) / (f_xi - f_xu)
-                f_xr = funcion.subs(x, xr)
-
-                # Calcular error relativo
-                ea = abs((xr - xr_anterior) / xr) * 100 if xr_anterior is not None else None
-
-                # Guardar datos de la iteración
-                resultados.append(
-                    [iteracion + 1, round(xi, 4), round(xu, 4), round(xr, 4), round(ea, 4) if ea else '-', round(f_xi, 4), round(f_xu, 4), round(f_xr, 4)]
-                )
-
-                # Verificar convergencia
-                if ea is not None and ea < tolerancia:
-                    break
-
-                # Actualizar intervalos
-                if f_xi * f_xr < 0:
-                    xu = xr
-                else:
-                    xi = xr
-
-                xr_anterior = xr
-                iteracion += 1
-
-            # Mostrar resultados en tabla
-            st.write("### Resultados por Iteración")
-            st.dataframe(
-                {
-                    "Iteración": [r[0] for r in resultados],
-                    "xi": [r[1] for r in resultados],
-                    "xu": [r[2] for r in resultados],
-                    "xr": [r[3] for r in resultados],
-                    "Error (%)": [r[4] for r in resultados],
-                    "f(xi)": [r[5] for r in resultados],
-                    "f(xu)": [r[6] for r in resultados],
-                    "f(xr)": [r[7] for r in resultados],
-                }
-            )
-
-            # Resumen final
-            st.success(f"Raíz aproximada: {xr:.6f}")
-            st.info(f"Error aproximado: {ea:.6f}%")
-            st.info(f"Método converge en {iteracion + 1} iteraciones.")
-
+            funcion = preparar_funcion(funcion)
+            tol = float(tolerancia)
+            max_iter = int(max_iter)
+            resultados, resumen = falsa_posicion(funcion, xi, xu, tol, max_iter)
+            # Mostrar resultados
+            columnas = ['Iteración', 'xi', 'xu', 'xr', 'Ea', 'yi', 'yu', 'yr']
+            st.write("### Resultados")
+            st.table(resultados)
+            st.write("### Resumen")
+            st.write(resumen)
         except Exception as e:
-            st.error(f"Ocurrió un error: {e}")
-
-# Ejecutar la función principal
-if __name__ == "__main__":
-    falsa_posicion()
+            st.error(f"Se produjo un error: {e}")
+            
+# Limpiar campos cuando el usuario lo desee
+if st.button("Limpiar"):
+    st.experimental_rerun()  # Esto recarga la página y limpia los campos
