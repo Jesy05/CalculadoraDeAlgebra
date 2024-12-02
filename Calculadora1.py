@@ -1191,7 +1191,7 @@ def interfaz_secante():
 
     # Entrada de la función
     st.subheader("Función")
-    funcion = st.text_input("Ingrese la función f(x):", value="x^3 - 6*x^2 + 11*x - 6", placeholder="Ejemplo: x^3 - 6*x^2 + 11*x - 6")
+    funcion = st.text_input("Ingrese la función f(x):", value="x^3 - 6*x^2 + 11*x - 6", placeholder="Ejemplo: x^3 - 6x^2 + 11x - 6")
 
     # Opciones para intervalos
     usar_intervalos = st.checkbox("¿Usar valores iniciales personalizados?", value=True)
