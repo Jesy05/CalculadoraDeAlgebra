@@ -24,6 +24,7 @@ from modulos.sistema_ecuaciones import resolver_sistema, graficar_sistema
 from modulos.falsa_posicion import preparar_funcion, falsa_posicion 
 from modulos.metodo_secante import preparar_funcion, metodo_secante
 from modulos.metodo_biseccion import parse_function, eval_function, bisection_method
+from modulos.metodo_newton_raphson import preparar_funcion, newton_raphson, graficar_funcion, calcular_raiz
 from modulos.juega import pantalla_juego
 import fractions as frac
 import matplotlib.pyplot as plt
