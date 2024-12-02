@@ -1045,7 +1045,7 @@ def interfaz_falsa_posicion():
     funcion_str = st.text_input(
         "Función (use 'x' como variable):", 
         value=st.session_state["funcion"], 
-        placeholder="Ejemplo: x**3 - 6*x**2 + 11*x - 6"
+        placeholder="Ejemplo: x^3 - 6x^2 + 11x - 6"
     )
     st.session_state["funcion"] = funcion_str
 
