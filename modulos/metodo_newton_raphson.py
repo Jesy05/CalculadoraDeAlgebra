@@ -7,24 +7,33 @@ import re
 def preparar_funcion(funcion):
     # Reemplaza las potencias y las multiplicaciones implícitas
     funcion = funcion.replace("^", "**")  # Cambiar ^ por ** para potencias
+    funcion = re.sub(r'(\d)([a-zA-Z])', r'\1*\2', funcion)  # Convertir 2x en 2*x
+    funcion = re.sub(r'([a-zA-Z])(\d)', r'\1*\2', funcion)  # Convertir x2 en x*2
 
-    # Convertir 2x, x2 y otras multiplicaciones implícitas como 2x o x2 en 2*x o x*2
-    funcion = re.sub(r'(\d)(x)', r'\1*\2', funcion)  # Convertir 2x en 2*x
-    funcion = re.sub(r'(x)(\d)', r'\1*\2', funcion)  # Convertir x2 en x*2
-    funcion = re.sub(r'(\d)([a-zA-Z])', r'\1*\2', funcion)  # Convertir 2a en 2*a
-
-    # Añadir las funciones matemáticas usando la biblioteca math
-    funciones_math = {
-        'sin': 'math.sin', 'cos': 'math.cos', 'tan': 'math.tan',
-        'cot': '1/math.tan', 'sec': '1/math.cos', 'csc': '1/math.sin',
-        'log': 'math.log10', 'ln': 'math.log', 'exp': 'math.exp',
-        'sqrt': 'math.sqrt', 'pi': 'math.pi', 'e': 'math.e'
+    # Reemplazar funciones matemáticas en español
+    funciones_spanish = {
+        'sen': 'math.sin',  # seno
+        'cos': 'math.cos',  # coseno
+        'tan': 'math.tan',  # tangente
+        'cot': '(1/math.tan)',  # cotangente
+        'sec': '(1/math.cos)',  # secante
+        'csc': '(1/math.sin)',  # cosecante
+        'ln': 'math.log',       # logaritmo natural
+        'log': 'math.log10',    # logaritmo base 10
+        'exp': 'math.exp',      # exponencial
+        'sqrt': 'math.sqrt',    # raíz cuadrada
+        'pi': 'math.pi',        # constante pi
+        'e': 'math.e'           # constante e
     }
 
-    # Reemplazar las funciones matemáticas con su equivalente en math
-    for key, val in funciones_math.items():
+    for key, val in funciones_spanish.items():
         funcion = funcion.replace(key, val)
-    
+
+    # Simplificaciones trigonométricas comunes
+    funcion = funcion.replace("sen^2", "(math.sin(x)**2)")  # sen^2(x)
+    funcion = funcion.replace("cos^2", "(math.cos(x)**2)")  # cos^2(x)
+    funcion = funcion.replace("tan^2", "(math.tan(x)**2)")  # tan^2(x)
+
     return funcion
 
 # Método de Newton-Raphson
@@ -66,10 +75,10 @@ def graficar_funcion(f, xi, xf, raiz):
 def calcular_raiz():
     try:
         # Recoger las entradas del usuario
-        funcion_str = st.text_input("Ingrese la función f(x):", "x^3 - 6x^2 + 11x - 6")
-        df_str = st.text_input("Ingrese la derivada f'(x):", "3x^2 - 12x + 11")
-        xi = st.number_input("Estimación inicial (xi):", value=1.0)
-        xf = st.number_input("Límite superior para graficar (xf):", value=2.0)
+        funcion_str = st.text_input("Ingrese la función f(x):", "sen^2(x) + cos^2(x) - 1")
+        df_str = st.text_input("Ingrese la derivada f'(x):", "2*sen(x)*cos(x)")
+        xi = st.number_input("Estimación inicial (xi):", value=0.5)
+        xf = st.number_input("Límite superior para graficar (xf):", value=3.0)
         tol = st.number_input("Tolerancia:", value=0.001)
         max_iter = st.number_input("Máximo de iteraciones:", value=100, min_value=1)
 
@@ -99,3 +108,8 @@ def calcular_raiz():
 
     except Exception as e:
         st.error(f"Ocurrió un error: {e}")
+
+# Llamar la función principal
+if __name__ == "__main__":
+    st.title("Método de Newton-Raphson Mejorado (Funciones en Español)")
+    calcular_raiz()
