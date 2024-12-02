@@ -4,4 +4,3 @@ pandas
 streamlit
 sympy
 math
-smath
