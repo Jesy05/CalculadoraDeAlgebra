@@ -1801,9 +1801,9 @@ def main():
 
     # Economía de flujo
     elif menu_principal == "Economía de flujo":
-        opcion = st.radio("Seleccione y resuelva", ["Flujo Básico", "Otro Análisis"])
-        if opcion:
-            economia_flujo()
+        opcion = "Economía de flujo"
+        economia_flujo()
 
 if __name__ == "__main__":
     main()
+
