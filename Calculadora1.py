@@ -1626,14 +1626,14 @@ def main():
             matriz = recibir_matriz_local("matriz_gauss")
             eliminacion_por_gauss(matriz)
 
-     if  menu_principal == "Economía de flujo":
+    if  menu_principal == "Economía de flujo":
         st.write("## ")
         economia_flujo()
 
-        elif opcion == "Regla de Cramer":
+    elif opcion == "Regla de Cramer":
             cramer_calculadora()
 
-        elif opcion == "Sistemas de ecuaciones lineales":
+    elif opcion == "Sistemas de ecuaciones lineales":
             st.write("###  ")
             sistema_ecuac()
 
