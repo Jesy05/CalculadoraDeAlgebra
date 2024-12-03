@@ -1449,7 +1449,7 @@ def interfaz():
 
 # Función principal de la calculadora
 def main():
-    st.title("Calculadora de Álgebra Lineal")
+    st.title("🧮Calculadora de Álgebra Lineal")
     st.write("Calculadora para realizar operaciones con matrices y vectores. Ideal para estudiantes y profesionales que buscan resolver problemas de álgebra lineal de forma rápida y sencilla.")
     st.write("Seleccione la operación que desea realizar:")
 
