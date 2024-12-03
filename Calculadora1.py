@@ -1615,7 +1615,8 @@ def main():
         "Operaciones de Vectores",
         "Operaciones con Matrices",
         "Transformaciones de Matrices",
-        "Métodos Numéricos"
+        "Métodos Numéricos",
+        "Economía de flujo"
     ])
 
     if menu_principal == "Resolución de Sistemas de Ecuaciones":
