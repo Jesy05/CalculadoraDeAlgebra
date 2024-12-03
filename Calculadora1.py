@@ -961,7 +961,7 @@ def eliminacion_por_gauss(matriz):
 
 def sistema_ecuac():
     # Configuración de la página
-    st.title("🧮 Resolución de Sistemas de Ecuaciones Lineales")
+    st.title("🔢 Resolución de Sistemas de Ecuaciones Lineales")
     st.write("Este programa resuelve sistemas de ecuaciones lineales de la forma:")
     st.latex("ra_1x + b_1y = c_1")
     st.latex("ra_2x + b_2y = c_2")
