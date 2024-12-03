@@ -1718,6 +1718,25 @@ def main():
         elif opcion == "Verificar propiedad A(u + v) = Au + Av":
             verificar_propiedad_distribucionalidad()
 
+    elif menu_principal == "Transformaciones de Matrices":
+        opcion = st.radio("Seleccione una operación:", [
+            "Transpuesta (propiedades)",
+            "Transpuesta simple",
+            "Determinante",
+            "Matriz en forma escalonada"
+        ])
+        if opcion == "Transpuesta (propiedades)":
+            propiedades_transpuesta()
+        elif opcion == "Transpuesta simple":
+            transpuesta_simple()
+        elif opcion == "Determinante":
+            determinante_calculadora()
+        elif opcion == "Matriz en forma escalonada":
+            st.write("### Matriz en forma escalonada")
+            matriz = recibir_matriz_local("matriz_escalonada")
+            eliminacion_por_gauss(matriz)
+    
+
     # Operaciones con matrices
     elif menu_principal == "Operaciones con Matrices":
         opcion = st.radio(
