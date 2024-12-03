@@ -54,7 +54,7 @@ def metodo_secante(funcion, x0, x1, tolerancia, max_iter):
         x0, x1 = x1, x2
 
     # Conclusión final
-    resultado_final = f"La raíz aproximada es {x2:.6f}, el error aproximado es {ea:.6f}%, el método converge a {i + 1} iteraciones."
+    resultado_final = f"La raíz aproximada es {x2:.6f}, el error aproximado es {ea:.6f}, el método converge a {i + 1} iteraciones."
     return resultados, resultado_final
 
 # Interfaz con Streamlit
