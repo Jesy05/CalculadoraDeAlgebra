@@ -25,6 +25,7 @@ from modulos.falsa_posicion import preparar_funcion, falsa_posicion
 from modulos.metodo_secante import preparar_funcion, metodo_secante
 from modulos.metodo_biseccion import parse_function, eval_function, bisection_method
 from modulos.metodo_newton_raphson import preparar_funcion, newton_raphson, graficar_funcion, calcular_raiz
+from modulos.economia_de_flujo import ejercicio_fabricante,ejercicio_gran_compania,ejercicio_joyeria,ejercicio_turista
 from modulos.juega import pantalla_juego
 import fractions as frac
 import matplotlib.pyplot as plt
@@ -1446,6 +1447,162 @@ def interfaz():
 
 
 #####
+##
+# Ejercicios de econmía de flujo
+
+# Ejercicio 1: Fabricante
+def mostrar_ejercicio_fabricante():
+    st.header("Ejercicio del Fabricante 🛠️")
+    
+    st.subheader("Ingreso de Datos")
+    D = st.text_input("Ingrese el vector de demanda (separado por comas):", "")
+    P = st.text_input("Ingrese el vector de precios unitarios (separado por comas):", "")
+    
+    if st.button("Calcular"):
+        try:
+            D = np.array([float(x) for x in D.split(",")])
+            P = np.array([float(x) for x in P.split(",")])
+            
+            if len(D) != len(P):
+                st.error("Los vectores de demanda y precios deben tener la misma longitud.")
+                return
+
+            total_ingreso = np.dot(D, P)
+
+            st.subheader("Procedimiento")
+            st.write(f"Vector de demanda (D): {D}")
+            st.write(f"Vector de precios unitarios (P): {P}")
+            st.write(f"Cálculo: Demanda × Precio = {D} × {P} = {total_ingreso}")
+
+            st.subheader("Análisis")
+            st.write("El fabricante recibe un total porque satisface toda la demanda de los artículos.")
+
+            st.subheader("Resultado Final")
+            st.write(f"Total Ingreso: ${total_ingreso:.2f}")
+        except ValueError:
+            st.error("Por favor, ingrese los vectores correctamente (separados por comas).")
+
+# Ejercicio 2: Joyería
+def mostrar_ejercicio_joyeria():
+    st.header("Ejercicio de la Joyería 💎")
+    
+    st.subheader("Ingreso de Datos")
+    ordenes = st.text_input("Ingrese el vector de órdenes (separado por comas):", "")
+    tiempos = st.text_input("Ingrese el vector de tiempos de elaboración (separado por comas):", "")
+    
+    if st.button("Calcular"):
+        try:
+            ordenes = np.array([float(x) for x in ordenes.split(",")])
+            tiempos = np.array([float(x) for x in tiempos.split(",")])
+            
+            if len(ordenes) != len(tiempos):
+                st.error("Los vectores de órdenes y tiempos deben tener la misma longitud.")
+                return
+
+            total_horas = np.dot(ordenes, tiempos)
+
+            st.subheader("Procedimiento")
+            st.write(f"Vector de órdenes (O): {ordenes}")
+            st.write(f"Vector de tiempos de elaboración (T): {tiempos}")
+            st.write(f"Cálculo: Órdenes × Tiempos = {ordenes} × {tiempos} = {total_horas}")
+
+            st.subheader("Análisis")
+            st.write(f"Se requieren:  {total_horas:} horas de trabajo para satisfacer los pedidos.")
+
+            st.subheader("Resultado Final")
+            st.write(f"Total de horas: {total_horas:.2f} horas")
+        except ValueError:
+            st.error("Por favor, ingrese los vectores correctamente (separados por comas).")
+
+# Ejercicio 3: Turista
+def mostrar_ejercicio_turista():
+    st.header("Ejercicio del Turista 🗺️")
+    
+    st.subheader("Ingreso de Datos")
+    cantidades = st.text_input("Ingrese el vector de cantidades (separado por comas):", "")
+    valores = st.text_input("Ingrese el vector de valores en dólares (separado por comas):", "")
+    
+    if st.button("Calcular"):
+        try:
+            cantidades = np.array([float(x) for x in cantidades.split(",")])
+            valores = np.array([float(x) for x in valores.split(",")])
+            
+            if len(cantidades) != len(valores):
+                st.error("Los vectores de cantidades y valores deben tener la misma longitud.")
+                return
+
+            total_dolares = np.dot(cantidades, valores)
+
+            st.subheader("Procedimiento")
+            st.write(f"Vector de cantidades (C): {cantidades}")
+            st.write(f"Vector de valores en dólares (V): {valores}")
+            st.write(f"Cálculo: Cantidad × Valor en dólares = {cantidades} × {valores} = {total_dolares:.2f}")
+
+            st.subheader("Análisis")
+            st.write("El total en dólares del turista se calcula multiplicando las cantidades por sus respectivos valores.")
+
+            st.subheader("Resultado Final")
+            st.write(f"Total en dólares: ${total_dolares:.2f}")
+        except ValueError:
+            st.error("Por favor, ingrese los vectores correctamente (separados por comas).")
+
+# Ejercicio 4: Gran Compañía
+def mostrar_ejercicio_gran_compania():
+    st.header("Ejercicio de la Gran Compañía 📉")
+    
+    st.subheader("Ingreso de Datos")
+    ventas = st.text_area("Ingrese la matriz de ventas por mes (use ; para separar filas y , para columnas):", "")
+    utilidades = st.text_input("Ingrese el vector de utilidades (separado por comas):", "")
+    impuestos = st.text_input("Ingrese el vector de impuestos (separado por comas):", "")
+    
+    if st.button("Calcular"):
+        try:
+            ventas = np.array([[float(x) for x in row.split(",")] for row in ventas.split(";")])
+            utilidades = np.array([float(x) for x in utilidades.split(",")])
+            impuestos = np.array([float(x) for x in impuestos.split(",")])
+            
+            if ventas.shape[1] != len(utilidades) or ventas.shape[1] != len(impuestos):
+                st.error("El número de columnas de la matriz de ventas debe coincidir con la longitud de los vectores de utilidades e impuestos.")
+                return
+
+            utilidades_totales = ventas @ utilidades
+            impuestos_totales = ventas @ impuestos
+
+            st.subheader("Procedimiento")
+            st.write(f"Matriz de ventas por mes (V):\n{ventas}")
+            st.write(f"Vector de utilidades (U): {utilidades}")
+            st.write(f"Vector de impuestos (I): {impuestos}")
+            st.write(f"Cálculo de utilidades: Ventas × Utilidades = {utilidades_totales}")
+            st.write(f"Cálculo de impuestos: Ventas × Impuestos = {impuestos_totales}")
+
+            st.subheader("Análisis")
+            st.write("Se calcularon las utilidades e impuestos para cada mes multiplicando las ventas por utilidades e impuestos unitarios.")
+
+            st.subheader("Resultados Finales")
+            meses = ["Enero", "Febrero", "Marzo", "Abril"]
+            for i, mes in enumerate(meses[:len(utilidades_totales)]):
+                st.write(f"{mes} | Utilidades: {utilidades_totales[i]:.2f} | Impuestos: {impuestos_totales[i]:.2f}")
+        except ValueError:
+            st.error("Por favor, ingrese los datos correctamente.")
+
+# Función principal
+def economia_flujo():
+    opcion = st.radio(
+        "Seleccione el ejercicio que desea resolver",
+        ["Fabricante, Ingreso de producción", "Cuentas de la Joyería", "Tesoro del viajero", "Ventas y beneficios"], 
+        index=0
+    )
+
+    if opcion == "Fabricante, Ingreso de producción":
+        mostrar_ejercicio_fabricante()
+    elif opcion == "Cuentas de la Joyería":
+        mostrar_ejercicio_joyeria()
+    elif opcion == "Tesoro del viajero":
+        mostrar_ejercicio_turista()
+    elif opcion == "Ventas y beneficios":
+        mostrar_ejercicio_gran_compania()
+##
+
 
 # Función principal de la calculadora
 def main():
@@ -1467,6 +1624,11 @@ def main():
             st.write("### Eliminación por Gauss ")
             matriz = recibir_matriz_local("matriz_gauss")
             eliminacion_por_gauss(matriz)
+
+     if  menu_principal == "Economía de flujo":
+        st.write("## ")
+        economia_flujo()
+
         elif opcion == "Regla de Cramer":
             cramer_calculadora()
 
