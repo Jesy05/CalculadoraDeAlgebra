@@ -1,5 +1,6 @@
 import math
 import re
+import numpy as np
 import pandas as pd
 import streamlit as st
 import sympy as sp
@@ -1605,47 +1606,56 @@ def economia_flujo():
 
 
 # Función principal de la calculadora
+
 def main():
-    st.title("🧮Calculadora de Álgebra Lineal")
+    st.title("🧮 Calculadora de Álgebra Lineal")
     st.write("Calculadora para realizar operaciones con matrices y vectores. Ideal para estudiantes y profesionales que buscan resolver problemas de álgebra lineal de forma rápida y sencilla.")
     st.write("Seleccione la operación que desea realizar:")
 
-    menu_principal = st.selectbox("Menú de Categorías", [
-        "Resolución de Sistemas de Ecuaciones",
-        "Operaciones de Vectores",
-        "Operaciones con Matrices",
-        "Transformaciones de Matrices",
-        "Métodos Numéricos",
-        "Economía de flujo"
-    ])
+    # Menú principal
+    menu_principal = st.selectbox(
+        "Menú de Categorías",
+        [
+            "Resolución de Sistemas de Ecuaciones",
+            "Operaciones de Vectores",
+            "Operaciones con Matrices",
+            "Transformaciones de Matrices",
+            "Métodos Numéricos",
+            "Economía de flujo"
+        ]
+    )
 
+    # Inicialización de la variable opcion
+    opcion = None
+
+    # Resolución de sistemas de ecuaciones
     if menu_principal == "Resolución de Sistemas de Ecuaciones":
-        opcion = st.radio("Seleccione una operación:", ["Eliminación por Gauss", "Regla de Cramer", "Sistemas de ecuaciones lineales"])
+        opcion = st.radio(
+            "Seleccione una operación:",
+            ["Eliminación por Gauss", "Regla de Cramer", "Sistemas de ecuaciones lineales"]
+        )
         if opcion == "Eliminación por Gauss":
-            st.write("### Eliminación por Gauss ")
+            st.write("### Eliminación por Gauss")
             matriz = recibir_matriz_local("matriz_gauss")
             eliminacion_por_gauss(matriz)
-
-    if  menu_principal == "Economía de flujo":
-        st.write("## ")
-        economia_flujo()
-
-    elif opcion == "Regla de Cramer":
+        elif opcion == "Regla de Cramer":
             cramer_calculadora()
-
-    elif opcion == "Sistemas de ecuaciones lineales":
-            st.write("###  ")
+        elif opcion == "Sistemas de ecuaciones lineales":
+            st.write("### Sistemas de Ecuaciones Lineales")
             sistema_ecuac()
 
-
+    # Operaciones con vectores
     elif menu_principal == "Operaciones de Vectores":
-        opcion = st.radio("Seleccione una operación:", [
-            "Multiplicación de vectores",
-            "Suma de vectores",
-            "Multiplicación de vector por escalar",
-            "Multiplicación de matriz por vector",
-            "Verificar propiedad A(u + v) = Au + Av"
-        ])
+        opcion = st.radio(
+            "Seleccione una operación:",
+            [
+                "Multiplicación de vectores",
+                "Suma de vectores",
+                "Multiplicación de vector por escalar",
+                "Multiplicación de matriz por vector",
+                "Verificar propiedad A(u + v) = Au + Av"
+            ]
+        )
         if opcion == "Multiplicación de vectores":
             multiplicacion_de_vectores()
         elif opcion == "Suma de vectores":
@@ -1658,29 +1668,28 @@ def main():
             st.write(resultado)
         elif opcion == "Multiplicación de matriz por vector":
             matriz_vector_multiplicacion()
-        
-
-            
         elif opcion == "Verificar propiedad A(u + v) = Au + Av":
             verificar_propiedad_distribucionalidad()
 
+    # Operaciones con matrices
     elif menu_principal == "Operaciones con Matrices":
-        opcion = st.radio("Seleccione una operación:", [
-            "Suma de matrices",
-            "Resta de matrices",
-            "Multiplicación de matrices",
-            "Inversa de una matriz",
-            "Multiplicación de matriz por escalar"
-        ])
+        opcion = st.radio(
+            "Seleccione una operación:",
+            [
+                "Suma de matrices",
+                "Resta de matrices",
+                "Multiplicación de matrices",
+                "Inversa de una matriz",
+                "Multiplicación de matriz por escalar"
+            ]
+        )
         if opcion == "Suma de matrices":
-            st.write("### Suma de Matrices")
             A = recibir_matriz_local("matriz_suma_A")
             B = recibir_matriz_local("matriz_suma_B")
             resultado = sumar_matrices(A, B)
             st.write("Resultado de la suma de matrices:")
             st.write(resultado)
         elif opcion == "Resta de matrices":
-            st.write("### Resta de Matrices")
             A = recibir_matriz_local("matriz_resta_A")
             B = recibir_matriz_local("matriz_resta_B")
             resultado = restar_matrices(A, B)
@@ -1691,78 +1700,44 @@ def main():
         elif opcion == "Inversa de una matriz":
             inversa()
         elif opcion == "Multiplicación de matriz por escalar":
-            st.write("###   ")
-    
             multiplicar_matriz_por_escalar()
-            
 
-    
-                
-
-    elif menu_principal == "Transformaciones de Matrices":
-        opcion = st.radio("Seleccione una operación:", [
-            "Transpuesta (propiedades)",
-            "Transpuesta simple",
-            "Determinante",
-            "Matriz en forma escalonada"
-        ])
-        if opcion == "Transpuesta (propiedades)":
-            propiedades_transpuesta()
-        elif opcion == "Transpuesta simple":
-            transpuesta_simple()
-        elif opcion == "Determinante":
-            determinante_calculadora()
-        elif opcion == "Matriz en forma escalonada":
-            st.write("### Matriz en forma escalonada")
-            matriz = recibir_matriz_local("matriz_escalonada")
-            eliminacion_por_gauss(matriz)
-
-
-    if  menu_principal == "Métodos Numéricos":
-    # Primero, aseguramos que se selecciona un tipo de método
-     metodo_tipo = st.radio(
-        "Seleccione una categoría de métodos:",
-        ["Métodos Cerrados", "Métodos Abiertos"]
-    )
-
-    # Dependiendo de la selección de 'metodo_tipo', se muestran las opciones correspondientes
-     if metodo_tipo == "Métodos Cerrados":
-        opcion = st.radio(
-            "Seleccione una operación (Métodos Cerrados):",
-            [
-                "Método de Falsa Posición",
-                "Método de Bisección",
-            ]
+    # Métodos numéricos
+    elif menu_principal == "Métodos Numéricos":
+        metodo_tipo = st.radio(
+            "Seleccione una categoría de métodos:",
+            ["Métodos Cerrados", "Métodos Abiertos"]
         )
-    
-     elif metodo_tipo == "Métodos Abiertos":
-        opcion = st.radio(
-            "Seleccione una operación (Métodos Abiertos):",
-            [
-                "Método de Newton-Raphson",
-                "Método de la Secante",
-            ]
-        )
-    
-    # Dependiendo de la opción seleccionada, mostramos la descripción
-    if opcion == "Método de Falsa Posición":
-        st.write("### Método de Falsa Posición")
-        interfaz_falsa_posicion()
-    
-    elif opcion == "Método de la Secante":
-        st.write("### Método de la Secante")
-        interfaz_secante()
 
-    elif opcion == "Método de Newton-Raphson":
-        st.write("### Método de Newton-Raphson")
-        interfaz()
-    
-    elif opcion == "Método de Bisección":
-        st.write("### Método de Bisección")
-        bisection_interface()
-    
-         
-          
+        if metodo_tipo == "Métodos Cerrados":
+            opcion = st.radio(
+                "Seleccione una operación (Métodos Cerrados):",
+                ["Método de Falsa Posición", "Método de Bisección"]
+            )
+        elif metodo_tipo == "Métodos Abiertos":
+            opcion = st.radio(
+                "Seleccione una operación (Métodos Abiertos):",
+                ["Método de Newton-Raphson", "Método de la Secante"]
+            )
+
+        if opcion == "Método de Falsa Posición":
+            st.write("### Método de Falsa Posición")
+            interfaz_falsa_posicion()
+        elif opcion == "Método de Bisección":
+            st.write("### Método de Bisección")
+            bisection_interface()
+        elif opcion == "Método de Newton-Raphson":
+            st.write("### Método de Newton-Raphson")
+            interfaz()
+        elif opcion == "Método de la Secante":
+            st.write("### Método de la Secante")
+            interfaz_secante()
+
+    # Economía de flujo
+    elif menu_principal == "Economía de flujo":
+        opcion = st.radio("Seleccione y resuelva", ["Flujo Básico", "Otro Análisis"])
+        if opcion:
+            economia_flujo()
 
 if __name__ == "__main__":
     main()
