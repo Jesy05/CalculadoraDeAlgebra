@@ -30,7 +30,7 @@ def generar_pregunta():
 
 # Función principal del juego
 def pantalla_juego():
-    st.write("### ¡Ejercita tus conocimientos con el juego de preguntas de álgebra lineal!")
+    st.write("### 🎮¡Ejercita tus conocimientos con el juego de preguntas de álgebra lineal!🎮")
     
     if st.button("Iniciar juego"):
         st.session_state.current_question, st.session_state.current_options, st.session_state.current_answer = generar_pregunta()
