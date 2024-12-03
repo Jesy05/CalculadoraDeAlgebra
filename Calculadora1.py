@@ -13,7 +13,7 @@ from modulos.suma_resta_matrices import sumar_matrices, restar_matrices
 from modulos.suma_vectores import suma_vectores
 from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
 from modulos.recibir_matriz import recibir_matriz, recibir_vector
-from modulos.regla_de_cramer import resolver_sistema
+from modulos.regla_de_cramer import resolver_sistema_cramer
 from modulos.determinante import calcular_determinante, pasos_determinante
 from modulos.multiplicacion_matrices import multiplicar_matrices
 from modulos.inversa import calcular_inversa_matriz, parsear_numero, calcular_determinante, agregar_identidad, hacer_pivote
@@ -29,6 +29,7 @@ from modulos.metodo_newton_raphson import preparar_funcion, newton_raphson, graf
 from modulos.economia_de_flujo import ejercicio_fabricante,ejercicio_gran_compania,ejercicio_joyeria,ejercicio_turista
 from modulos.juega import pantalla_juego
 import fractions as frac
+from fractions import Fraction
 import matplotlib.pyplot as plt
 import matplotlib
 
@@ -940,21 +941,67 @@ def restar_matrices(A, B):
     resultado = [[A[i][j] - B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
     return resultado
 
-def cramer_regla(matriz, vector):
-    import numpy as np
-    det_matriz = np.linalg.det(matriz)
-    if det_matriz == 0:
-        st.write("Error: La matriz no tiene inversa, por lo tanto, no se puede aplicar la regla de Cramer.")
-        return None
+#parsear para fracciones 
 
-    soluciones = []
-    for i in range(len(vector)):
-        matriz_modificada = np.copy(matriz)
-        matriz_modificada[:, i] = vector
-        det_modificada = np.linalg.det(matriz_modificada)
-        soluciones.append(det_modificada / det_matriz)
+def parsear_numero(valor):
+    """Convierte un valor a Fraction, float o int según corresponda."""
+    try:
+        if "/" in valor:
+            return Fraction(valor)  # Manejar fracciones
+        elif "." in valor:
+            return float(valor)    # Manejar decimales
+        else:
+            return int(valor)      # Manejar enteros
+    except ValueError:
+        raise ValueError(f"El valor '{valor}' no es válido. Use enteros, decimales o fracciones (ej. 3/4).")
 
-    return soluciones
+def cramer_calculadora():
+    st.write("### Regla de Cramer")
+    
+    # Configurar la entrada de la matriz
+    st.write("Ingrese los coeficientes de la matriz y el vector aumentado:")
+    num_variables = st.selectbox("Número de variables", [2, 3, 4], index=0)
+    
+    # Generar campos de entrada para la matriz y el vector
+    matriz = []
+    for i in range(num_variables):
+        fila = []
+        cols = st.columns(num_variables + 1)
+        for j in range(num_variables + 1):
+            placeholder = f"({i+1},{j+1})" if j < num_variables else f"(aumentada {i+1})"
+            valor = cols[j].text_input(placeholder, value="", key=f"cramer_cell_{i}_{j}")
+            fila.append(valor)
+        matriz.append(fila)
+
+    # Botón para resolver
+    if st.button("Resolver sistema"):
+        try:
+            # Procesar la entrada
+            coeficientes = [[parsear_numero(cell) for cell in fila[:-1]] for fila in matriz]
+            terminos = [parsear_numero(fila[-1]) for fila in matriz]
+
+            # Llamar a la función del módulo
+            resultado = resolver_sistema_cramer(coeficientes, terminos)
+
+            # Mostrar los resultados
+            if resultado["soluciones"] is None:
+                st.error(resultado["mensaje"])
+            else:
+                st.subheader("Soluciones del sistema:")
+                for i, solucion in enumerate(resultado["soluciones"]):
+                    st.write(f"x{i+1} = {str(solucion)}")
+
+            # Mostrar pasos detallados
+            with st.expander("Pasos detallados"):
+                st.write(f"Determinante principal: {resultado['pasos']['det_principal']}")
+                for detalle in resultado["pasos"]["detalles"]:
+                    st.write(f"Determinante para {detalle['variable']}: {detalle['det_i']}")
+                    st.write("Matriz modificada:")
+                    st.table(detalle["matriz_modificada"])
+        except ValueError:
+            st.error("Por favor, ingrese valores válidos (enteros, decimales o fracciones) en todos los campos.")
+        except Exception as e:
+            st.error(f"Error inesperado: {e}")
 
 def eliminacion_por_gauss(matriz):
     eliminacion_por_gauss_modulo(matriz)
