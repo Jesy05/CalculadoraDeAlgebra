@@ -9,7 +9,7 @@ from modulos.escalonada import forma_escalonada, imprimir_matriz, imprimir_soluc
 from modulos.multiplicacion_vectores import multiplicacion_de_vectores
 from modulos.multiplicacion_matriz_vector import multiplicacion_matriz_por_vector
 from modulos.multiplicacion_vector_escalar import multiplicacion_vector_por_escalar
-from modulos.suma_resta_matrices import sumar_matrices, restar_matrices
+from modulos.suma_resta_matrices import ingresar_matrices, suma_resta_matrices
 from modulos.suma_vectores import suma_vectores
 from modulos.verificar_propiedad_distribucionalidad import verificar_propiedad_distribucionalidad
 from modulos.recibir_matriz import recibir_matriz, recibir_vector
@@ -32,6 +32,7 @@ import fractions as frac
 from fractions import Fraction
 import matplotlib.pyplot as plt
 import matplotlib
+from sympy import sympify, Matrix
 
 
 # Inicializar las claves en st.session_state si no existen
@@ -927,19 +928,64 @@ def verificar_propiedad_distribucionalidad():
     else:
         st.write("La propiedad A(u + v) = Au + Av no se verifica.")
 
-def sumar_matrices(A, B):
-    if len(A) != len(B) or len(A[0]) != len(B[0]):
-        st.write("Error: Las matrices deben tener las mismas dimensiones.")
-        return None
-    resultado = [[A[i][j] + B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
-    return resultado
+#working
 
-def restar_matrices(A, B):
-    if len(A) != len(B) or len(A[0]) != len(B[0]):
-        st.write("Error: Las matrices deben tener las mismas dimensiones.")
-        return None
-    resultado = [[A[i][j] - B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
-    return resultado
+# Función para ingresar las matrices
+def ingresar_matrices():
+    st.write("Ingrese las dimensiones de las matrices:")
+    filas = st.number_input("Número de filas:", min_value=1, max_value=10, value=3, step=1)
+    columnas = st.number_input("Número de columnas:", min_value=1, max_value=10, value=3, step=1)
+
+    st.write("Ingrese los valores de la Matriz A:")
+    matriz_a = []
+    for i in range(filas):
+        fila = []
+        cols = st.columns(columnas)
+        for j in range(columnas):
+            entrada = cols[j].text_input(f"A[{i+1},{j+1}]", value="0", key=f"a_{i}_{j}")
+            fila.append(sympify(entrada))
+        matriz_a.append(fila)
+
+    st.write("Ingrese los valores de la Matriz B:")
+    matriz_b = []
+    for i in range(filas):
+        fila = []
+        cols = st.columns(columnas)
+        for j in range(columnas):
+            entrada = cols[j].text_input(f"B[{i+1},{j+1}]", value="0", key=f"b_{i}_{j}")
+            fila.append(sympify(entrada))
+        matriz_b.append(fila)
+
+    matriz_a = Matrix(matriz_a)
+    matriz_b = Matrix(matriz_b)
+    return matriz_a, matriz_b
+
+# Módulo para suma de matrices
+def suma_matrices():
+    st.header("Suma de Matrices")
+    A, B = ingresar_matrices()  # Ingreso de matrices
+
+    if st.button("Calcular Suma"):
+        try:
+            suma = A + B
+            st.subheader("Resultado de la Suma:")
+            st.write(suma)
+        except Exception as e:
+            st.error(f"Error: {e}")
+
+# Módulo para resta de matrices
+def resta_matrices():
+    st.header("Resta de Matrices")
+    A, B = ingresar_matrices()  # Ingreso de matrices
+
+    if st.button("Calcular Resta"):
+        try:
+            resta = A - B
+            st.subheader("Resultado de la Resta:")
+            st.write(resta)
+        except Exception as e:
+            st.error(f"Error: {e}")
+
 
 #parsear para fracciones 
 
@@ -1749,24 +1795,34 @@ def main():
                 "Multiplicación de matriz por escalar"
             ]
         )
-        if opcion == "Suma de matrices":
-            A = recibir_matriz_local("matriz_suma_A")
-            B = recibir_matriz_local("matriz_suma_B")
-            resultado = sumar_matrices(A, B)
-            st.write("Resultado de la suma de matrices:")
-            st.write(resultado)
-        elif opcion == "Resta de matrices":
-            A = recibir_matriz_local("matriz_resta_A")
-            B = recibir_matriz_local("matriz_resta_B")
-            resultado = restar_matrices(A, B)
-            st.write("Resultado de la resta de matrices:")
-            st.write(resultado)
-        elif opcion == "Multiplicación de matrices":
-            matrices_multiplicacion()
-        elif opcion == "Inversa de una matriz":
-            inversa()
-        elif opcion == "Multiplicación de matriz por escalar":
-            multiplicar_matriz_por_escalar()
+    if opcion == "Suma de matrices":
+        st.header("Suma de Matrices")
+        A, B = ingresar_matrices()  # Usa la función para obtener las matrices
+        if A.shape == B.shape:  # Verifica que las matrices tengan las mismas dimensiones
+            if st.button("Calcular Suma"):
+                resultado = A + B
+                st.subheader("Resultado de la suma de matrices:")
+                st.write(resultado)
+            else:
+                st.error("Las matrices deben tener las mismas dimensiones para poder sumarse.")
+
+    elif opcion == "Resta de matrices":
+        st.header("Resta de Matrices")
+        A, B = ingresar_matrices()  # Usa la función para obtener las matrices
+        if A.shape == B.shape:  # Verifica que las matrices tengan las mismas dimensiones
+            if st.button("Calcular Resta"):
+                resultado = A - B
+                st.subheader("Resultado de la resta de matrices:")
+                st.write(resultado)
+        else:
+            st.error("Las matrices deben tener las mismas dimensiones para poder restarse.")
+
+    elif opcion == "Multiplicación de matrices":
+        matrices_multiplicacion()
+    elif opcion == "Inversa de una matriz":
+        inversa()
+    elif opcion == "Multiplicación de matriz por escalar":
+        multiplicar_matriz_por_escalar()
 
     # Métodos numéricos
     elif menu_principal == "Métodos Numéricos":
@@ -1806,4 +1862,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
