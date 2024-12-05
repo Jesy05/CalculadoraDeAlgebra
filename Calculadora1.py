@@ -1489,7 +1489,6 @@ def plot_function_and_derivative(func, deriv, var):
 # Función para la interfaz de derivadas
 def derivadas_interface():
     st.title("𝞹🔢 Calculadora de Derivadas")
-    st.write("Ingrese la función usando el formato `2*x**2` para potencias y `2*x` para multiplicaciones.")
     st.write("Puede incluir funciones trigonométricas, exponenciales, logarítmicas, y más.")
 
     # Entrada de la función
