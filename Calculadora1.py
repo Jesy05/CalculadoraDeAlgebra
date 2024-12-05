@@ -1212,7 +1212,7 @@ def interfaz_falsa_posicion():
                         "xi": round(xi, 4),
                         "xu": round(xu, 4),
                         "xr": round(xr, 4),
-                        "Error (%)": round(ea, 4) if ea is not None else "-",
+                        "Error": round(ea, 4) if ea is not None else "-",
                         "f(xi)": round(f_xi, 4),
                         "f(xu)": round(f_xu, 4),
                         "f(xr)": round(f_xr, 4),
@@ -1238,7 +1238,7 @@ def interfaz_falsa_posicion():
 
             # Resumen final
             st.success(f"Raíz aproximada: {xr:.6f}")
-            st.info(f"Error aproximado: {ea:.6f}%")
+            st.info(f"Error aproximado: {ea:.6f}")
             st.info(f"Método converge en {iteracion + 1} iteraciones.")
 
         except Exception as e:
@@ -1300,7 +1300,7 @@ def metodo_secante(funcion, x0, x1, tolerancia, max_iter):
         x0, x1 = x1, x2
 
     # Conclusión final
-    resultado_final = f"La raíz aproximada es {x2:.6f}, el error aproximado es {ea:.6f}%, el método converge a {i + 1} iteraciones."
+    resultado_final = f"La raíz aproximada es {x2:.6f}, el error aproximado es {ea:.6f}, el método converge a {i + 1} iteraciones."
     return resultados, resultado_final
 
 # Interfaz de Streamlit
@@ -1355,7 +1355,7 @@ def interfaz_secante():
                     "x0": [r[1] for r in resultados],
                     "x1": [r[2] for r in resultados],
                     "x2": [r[3] for r in resultados],
-                    "Error (%)": [r[4] for r in resultados],
+                    "Error ": [r[4] for r in resultados],
                     "f(x0)": [r[5] for r in resultados],
                     "f(x1)": [r[6] for r in resultados],
                 }
