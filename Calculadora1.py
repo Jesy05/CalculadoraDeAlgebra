@@ -22,7 +22,7 @@ from modulos.verificar_traspuesta import verificar_propiedades_matrices, parsear
 from modulos.transpuesta_simple import calcular_transpuesta
 from modulos.multiplicacion_matriz_escalar import multiplicar_matriz_por_escalar 
 from modulos.sistema_ecuaciones import resolver_sistema, graficar_sistema
-from modulos.falsa_posicion import preprocesar_funcion, metodo_falsa_posicion
+from modulos.falsa_posicion import prreprocesar_funcion, metodo_falsa_posicion
 from modulos.metodo_secante import metodo_secante, preprocesar_funcion
 from modulos.metodo_biseccion import parse_function, eval_function, bisection_method
 from modulos.metodo_newton_raphson import preparar_funcion, newton_raphson, graficar_funcion, calcular_raiz
@@ -1196,27 +1196,32 @@ def interfaz_falsa_posicion():
 #####
 
 #Método de la Secante
-
 def interfaz_secante():
     """
     Interfaz gráfica para calcular la raíz de una función usando el método del secante.
     """
     st.title("Cálculo de Raíces - Método del Secante")
 
+    # Pregunta al usuario si desea usar intervalos
+    st.header("¿Deseas usar intervalos?")
+    usar_intervalo = st.radio("Selecciona una opción:", ("Sí", "No")) == "Sí"
+
     st.header("Ingrese los datos necesarios")
+
     funcion = st.text_input("Función en términos de x (ejemplo: 3x^2 + 4x - 10):", "3x^2 + 4x - 10")
     x0 = st.number_input("Valor inicial x0:", value=1.0)
-    x1 = st.number_input("Valor inicial x1:", value=2.0)
     tolerancia = st.number_input("Tolerancia:", value=0.0001, format="%.8f")
     max_iter = st.number_input("Número máximo de iteraciones:", value=50, step=1)
 
+    if usar_intervalo:
+        x1 = st.number_input("Valor inicial x1:", value=2.0)
+    else:
+        x1 = x0 + 1e-5  # Si no se usan intervalos, ajustamos x1 automáticamente
+
     if st.button("Calcular"):
         try:
-            # Convertir tolerancia de porcentaje a formato decimal
-            tolerancia_decimal = tolerancia
-
             # Llamar a la lógica del método secante
-            resultados = metodo_secante(funcion, x0, x1, tolerancia_decimal, max_iter)
+            resultados = metodo_secante(funcion, x0, x1, tolerancia, max_iter, usar_intervalo)
 
             # Mostrar los resultados iterativos en una tabla
             st.subheader("Resultados por Iteración")
@@ -1237,6 +1242,7 @@ def interfaz_secante():
 
         except Exception as e:
             st.error(f"Ha ocurrido un error: {e}")
+
 
 
 #####
