@@ -1,7 +1,7 @@
 import streamlit as st
 import sympy as sp
 
-def preprocesar_funcion(funcion):
+def prreprocesar_funcion(funcion):
     """
     Preprocesa la función para permitir notaciones comunes como `^` para exponentes 
     y multiplicaciones implícitas como `3x` y `x^2`.
@@ -29,7 +29,7 @@ def metodo_falsa_posicion(funcion, x0, x1, tolerancia, max_iter):
     :return: Diccionario con los resultados y la conclusión final.
     """
     x = sp.symbols('x')
-    f = preprocesar_funcion(funcion)
+    f = prreprocesar_funcion(funcion)
 
     resultados = []
     raiz_encontrada = False
