@@ -7,17 +7,20 @@ def preprocesar_funcion(funcion):
     y multiplicaciones implícitas como `3x` y `x^2`.
 
     :param funcion: Función como cadena.
-    :return: Función procesada como cadena.
+    :return: Función procesada como una expresión simbólica de sympy.
     """
     # Reemplazar "^" por "**" para compatibilidad con SymPy
     funcion = funcion.replace("^", "**")
     
     # Convertir la cadena a una representación simbólica usando sympy
-    funcion = sp.sympify(funcion, evaluate=False)
+    try:
+        funcion = sp.sympify(funcion, evaluate=False)
+    except Exception as e:
+        raise ValueError(f"Error en la función ingresada: {e}")
     
     return funcion
 
-def metodo_secante(funcion, x0, x1, tolerancia, max_iter):
+def metodo_secante(funcion, x0, x1, tolerancia, max_iter, usar_intervalos):
     """
     Encuentra la raíz de una función usando el método del secante.
 
@@ -26,6 +29,7 @@ def metodo_secante(funcion, x0, x1, tolerancia, max_iter):
     :param x1: Segundo valor inicial.
     :param tolerancia: Tolerancia deseada para el error (en porcentaje: 0.0001 equivale a 0.01%).
     :param max_iter: Número máximo de iteraciones.
+    :param usar_intervalos: Si es True, se trabaja con intervalos, si es False, no.
     :return: Diccionario con los resultados y la conclusión final.
     """
     x = sp.symbols('x')
@@ -34,6 +38,10 @@ def metodo_secante(funcion, x0, x1, tolerancia, max_iter):
     resultados = []
     raiz_encontrada = False
     mensaje_final = ""
+
+    # Si no se utilizan intervalos, ajustamos x1 igual a x0
+    if not usar_intervalos:
+        x1 = x0 + 1e-5  # Usamos un valor arbitrario pequeño para x1
 
     for iteracion in range(1, max_iter + 1):
         fx0 = float(f.subs(x, x0))
