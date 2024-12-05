@@ -1441,10 +1441,110 @@ def interfaz():
         except Exception as e:
             st.error(f"Ocurrió un error: {e}")
 
+#####
+
+
+##DERIVADAS
+
+# Función para graficar la función y su derivada
+def plot_function_and_derivative(func, deriv, var):
+    try:
+        # Crear valores de x
+        x_vals = np.linspace(-10, 10, 500)
+        func_vals = []
+        deriv_vals = []
+        
+        # Evaluar la función y la derivada
+        for x in x_vals:
+            try:
+                func_vals.append(float(func.subs(var, x)))
+                deriv_vals.append(float(deriv.subs(var, x)))
+            except Exception as e:
+                func_vals.append(np.nan)  # Si hay error, agregar NaN
+                deriv_vals.append(np.nan)
+        
+        # Comprobación de la longitud de los valores
+        if len(func_vals) != len(deriv_vals):
+            st.error("Los valores de la función y la derivada no coinciden en tamaño.")
+            return
+
+        # Crear la gráfica
+        plt.figure(figsize=(10, 6))
+        plt.plot(x_vals, func_vals, label="Función", color="blue")
+        plt.plot(x_vals, deriv_vals, label="Derivada", color="red")
+        plt.axhline(0, color="black", linewidth=0.8, linestyle="--")
+        plt.axvline(0, color="black", linewidth=0.8, linestyle="--")
+        ###plt.title("Gráfica de la Función y su Derivada")
+        plt.xlabel("x")
+        plt.ylabel("y")
+        plt.legend()
+        plt.grid(True)
+
+        # Mostrar la gráfica en Streamlit
+        st.pyplot(plt)
+
+    except Exception as e:
+        st.error(f"Error al generar la gráfica: {e}")
+
+# Función para la interfaz de derivadas
+def derivadas_interface():
+    st.title("𝞹🔢 Calculadora de Derivadas")
+    st.write("Ingrese la función usando el formato `2x^2` para potencias y `2x` para multiplicaciones.")
+    st.write("Puede incluir funciones trigonométricas, exponenciales, logarítmicas, y más.")
+
+    # Entrada de la función
+    funcion = st.text_input("Función (use 'x' como variable):", key="funcion_derivada")
+    calcular = st.button("Calcular")  # Botón de calcular
+
+    if calcular and funcion:
+        try:
+            # Paso 1: Reemplazar "^" por "**" para compatibilidad con SymPy
+            st.subheader("Paso 1: Interpretación de la función")
+            funcion_formato_sympy = funcion.replace("^", "**")
+            st.write(f"La función ingresada se interpreta como: `{funcion_formato_sympy}` en formato SymPy.")
+
+            # Paso 2: Convertir a expresión simbólica
+            st.subheader("Paso 2: Conversión a expresión simbólica")
+            x = sp.Symbol('x')
+            f = sp.sympify(funcion_formato_sympy)
+            st.write(f"La función simbólica es: `{f}`")
+
+            # Paso 3: Calcular la derivada
+            st.subheader("Paso 3: Cálculo de la derivada")
+            derivada = sp.diff(f, x)
+            derivada_formato_usuario = str(derivada).replace("**", "^")
+            st.write(f"La derivada calculada es: `{derivada_formato_usuario}`")
+
+            # Mostrar resultados finales
+            st.subheader("Resultados Finales")
+            st.write(f"**Función ingresada:** {funcion}")
+            st.write(f"**Derivada:** {derivada_formato_usuario}")
+
+            # Paso 4: Gráfica opcional
+            ##plot_function_and_derivative(f, derivada, x)
+
+        except Exception as e:
+            st.error(f"Error al procesar la función: {e}")
+
+# Interfaz principal de Streamlit
+def main():
+    st.sidebar.title("📚 Menú Principal")
+    menu = st.sidebar.radio(
+        "Seleccione una categoría:",
+        ["Inicio", "Cálculo de Derivadas"]
+    )
+    
+    if menu == "Inicio":
+        st.title("Bienvenido a la Calculadora de Derivadas")
+        st.write("Esta herramienta permite calcular derivadas de funciones algebraicas, trigonométricas, exponenciales, y más.")
+        st.write("Seleccione **Cálculo de Derivadas** en el menú para comenzar.")
+    elif menu == "Cálculo de Derivadas":
+        derivadas_interface()
 
 
 #####
-##
+
+
 # Ejercicios de econmía de flujo
 
 # Ejercicio 1: Fabricante
@@ -1617,7 +1717,8 @@ def main():
             "Operaciones con Matrices",
             "Transformaciones de Matrices",
             "Métodos Numéricos",
-            "Economía de flujo"
+            "Economía de flujo",
+            "Derivadas"
         ]
     )
 
@@ -1762,6 +1863,11 @@ def main():
     elif menu_principal == "Economía de flujo":
         opcion = "Economía de flujo"
         economia_flujo()
+
+    # Derivadas
+    elif menu_principal == "Derivadas":
+        opcion = "Derivadas"
+        derivadas_interface()
 
 if __name__ == "__main__":
     main()
