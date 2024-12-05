@@ -4,18 +4,18 @@ import sympy as sp
 def preprocesar_funcion(funcion):
     """
     Preprocesa la función para permitir notaciones comunes como `^` para exponentes 
-    y multiplicaciones implícitas como `3x`.
+    y multiplicaciones implícitas como `3x` y `x^2`.
 
     :param funcion: Función como cadena.
     :return: Función procesada como cadena.
     """
     # Reemplazar "^" por "**" para compatibilidad con SymPy
     funcion = funcion.replace("^", "**")
-
-    # Insertar multiplicaciones explícitas donde faltan
-    funcion = sp.srepr(sp.sympify(funcion, evaluate=False))  # Convierte a representación simbólica
-    funcion = funcion.replace("*Symbol", "* Symbol")  # Agregar multiplicaciones explícitas
-    return sp.sympify(funcion)  # Convertir de nuevo a función
+    
+    # Convertir la cadena a una representación simbólica usando sympy
+    funcion = sp.sympify(funcion, evaluate=False)
+    
+    return funcion
 
 def metodo_secante(funcion, x0, x1, tolerancia, max_iter):
     """
