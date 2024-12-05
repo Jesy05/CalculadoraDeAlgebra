@@ -1247,6 +1247,7 @@ def interfaz_falsa_posicion():
 #####
 
 #Método de la Secante
+
 def interfaz_secante():
     """
     Interfaz gráfica para calcular la raíz de una función usando el método del secante.
@@ -1287,6 +1288,7 @@ def interfaz_secante():
 
         except Exception as e:
             st.error(f"Ha ocurrido un error: {e}")
+
 
 #####
 
