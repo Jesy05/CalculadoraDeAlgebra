@@ -32,7 +32,7 @@ import fractions as frac
 from fractions import Fraction
 import matplotlib.pyplot as plt
 import matplotlib
-from sympy import sympify, Matrix
+from sympy import sympify, Matrix, SympifyError
 
 
 # Inicializar las claves en st.session_state si no existen
@@ -943,8 +943,30 @@ def ingresar_matrices():
         cols = st.columns(columnas)
         for j in range(columnas):
             entrada = cols[j].text_input(f"A[{i+1},{j+1}]", value="0", key=f"a_{i}_{j}")
-            fila.append(sympify(entrada))
+            try:
+                fila.append(sympify(entrada))
+            except SympifyError:
+                st.error(f"El valor ingresado en A[{i+1},{j+1}] no es válido. Por favor, ingrese un número, fracción o expresión válida.")
+                return None, None
         matriz_a.append(fila)
+
+    st.write("Ingrese los valores de la Matriz B:")
+    matriz_b = []
+    for i in range(filas):
+        fila = []
+        cols = st.columns(columnas)
+        for j in range(columnas):
+            entrada = cols[j].text_input(f"B[{i+1},{j+1}]", value="0", key=f"b_{i}_{j}")
+            try:
+                fila.append(sympify(entrada))
+            except SympifyError:
+                st.error(f"El valor ingresado en B[{i+1},{j+1}] no es válido. Por favor, ingrese un número, fracción o expresión válida.")
+                return None, None
+        matriz_b.append(fila)
+
+    matriz_a = Matrix(matriz_a)
+    matriz_b = Matrix(matriz_b)
+    return matriz_a, matriz_b
 
     st.write("Ingrese los valores de la Matriz B:")
     matriz_b = []
