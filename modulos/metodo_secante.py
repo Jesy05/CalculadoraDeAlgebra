@@ -1,95 +1,81 @@
 import streamlit as st
 import sympy as sp
-import re
 
-# Función para convertir y preparar la función matemática
-def preparar_funcion(funcion):
-    funciones_math = {
-        'sen': 'sin',
-        'sin': 'sin',
-        'cos': 'cos',
-        'tan': 'tan',
-        'cot': '1/tan',
-        'sec': '1/cos',
-        'csc': '1/sin',
-        'log': 'log10',
-        'ln': 'log',
-        'exp': 'exp',
-        'sqrt': 'sqrt',
-        'pi': 'pi',
-        'e': 'E'
-    }
-    try:
-        funcion = funcion.replace('^', '**').replace(' ', '')
-        funcion = re.sub(r'(\d)([a-zA-Z])', r'\1*\2', funcion)
-        funcion = re.sub(r'(\))(?=\d|[a-zA-Z])', r')*', funcion)
-        for key, val in funciones_math.items():
-            funcion = re.sub(r'\b' + key + r'\b', val, funcion)
-        return funcion
-    except Exception as e:
-        raise ValueError(f"Error al procesar la función: {e}")
+def preprocesar_funcion(funcion):
+    """
+    Preprocesa la función para permitir notaciones comunes como `^` para exponentes 
+    y multiplicaciones implícitas como `3x`.
 
-# Método de la Secante
+    :param funcion: Función como cadena.
+    :return: Función procesada como cadena.
+    """
+    # Reemplazar "^" por "**" para compatibilidad con SymPy
+    funcion = funcion.replace("^", "**")
+
+    # Insertar multiplicaciones explícitas donde faltan
+    funcion = sp.srepr(sp.sympify(funcion, evaluate=False))  # Convierte a representación simbólica
+    funcion = funcion.replace("*Symbol", "* Symbol")  # Agregar multiplicaciones explícitas
+    return sp.sympify(funcion)  # Convertir de nuevo a función
+
 def metodo_secante(funcion, x0, x1, tolerancia, max_iter):
+    """
+    Encuentra la raíz de una función usando el método del secante.
+
+    :param funcion: Función como cadena.
+    :param x0: Primer valor inicial.
+    :param x1: Segundo valor inicial.
+    :param tolerancia: Tolerancia deseada para el error (en porcentaje: 0.0001 equivale a 0.01%).
+    :param max_iter: Número máximo de iteraciones.
+    :return: Diccionario con los resultados y la conclusión final.
+    """
+    x = sp.symbols('x')
+    f = preprocesar_funcion(funcion)
+
     resultados = []
-    f = sp.sympify(funcion)
-    x0, x1 = float(x0), float(x1)
-    ea = None  # Inicializamos el error aproximado
-    
-    for i in range(max_iter):
-        y0 = f.subs('x', x0)
-        y1 = f.subs('x', x1)
+    raiz_encontrada = False
+    mensaje_final = ""
 
-        if y1 - y0 == 0:
-            raise ZeroDivisionError("La división por cero ocurrió en el método de la secante.")
+    for iteracion in range(1, max_iter + 1):
+        fx0 = float(f.subs(x, x0))
+        fx1 = float(f.subs(x, x1))
 
-        x2 = x1 - y1 * (x1 - x0) / (y1 - y0)
-        ea = abs((x2 - x1) / x2) * 100 if i > 0 else None
-        resultados.append([i + 1, x0, x1, x2, ea, y0, y1])
-
-        # Detener el método si el error aproximado es menor que la tolerancia
-        if ea is not None and ea < tolerancia:
+        if fx1 - fx0 == 0:  # Evitar división por cero
+            mensaje_final = f"Error: División por cero en la iteración {iteracion}."
             break
 
+        # Calcular el siguiente x2
+        x2 = x1 - fx1 * (x1 - x0) / (fx1 - fx0)
+        error = abs(x2 - x1)
+
+        # Guardar los resultados de la iteración
+        resultados.append((iteracion, x0, x1, x2, error, fx0, fx1))
+
+        # Verificar si se alcanzó la tolerancia
+        if error < tolerancia:
+            raiz_encontrada = True
+            mensaje_final = (
+                f"La raíz encontrada es: {x2:.6f} en {iteracion} iteraciones "
+                f"con un error de: {error:.6f}."
+            )
+            break
+
+        # Actualizar valores
         x0, x1 = x1, x2
 
-    # Conclusión final
-    resultado_final = f"La raíz aproximada es {x2:.6f}, el error aproximado es {ea:.6f}, el método converge a {i + 1} iteraciones."
-    return resultados, resultado_final
+    if not raiz_encontrada and not mensaje_final:
+        mensaje_final = (
+            f"No se encontró la raíz en el máximo de {max_iter} iteraciones. "
+            "Esto puede deberse a que la raíz no está en el intervalo dado "
+            "o a una elección inadecuada de valores iniciales x0 y x1."
+        )
 
-# Interfaz con Streamlit
-st.title("Método de la Secante - Streamlit")
-st.markdown("Aplicación para resolver ecuaciones no lineales usando el Método de la Secante.")
-
-# Entrada de datos
-funcion = st.text_input("Introduce la función (usa 'x' como variable):", value="x^3 - 6*x^2 + 11*x - 6")
-usar_intervalos = st.checkbox("¿Usar intervalos?")
-
-x0 = st.text_input("Introduce x0:", value="1" if usar_intervalos else "", key="x0")
-x1 = st.text_input("Introduce x1:", value="2" if usar_intervalos else "", key="x1")
-tolerancia = st.number_input("Tolerancia:", min_value=0.0, value=0.001, step=0.0001, format="%.6f")
-max_iter = st.number_input("Máx. Iteraciones:", min_value=1, value=50, step=1)
-
-# Botón de cálculo
-if st.button("Calcular"):
-    try:
-        funcion_preparada = preparar_funcion(funcion)
-
-        if usar_intervalos:
-            if not x0 or not x1:
-                st.error("Por favor, completa los intervalos si seleccionaste usarlos.")
-            else:
-                resultados, resumen = metodo_secante(funcion_preparada, x0, x1, tolerancia, max_iter)
-                st.success(resumen)
-        else:
-            x0 = x0 if x0 else "1"
-            x1 = x1 if x1 else "2"
-            resultados, resumen = metodo_secante(funcion_preparada, x0, x1, tolerancia, max_iter)
-            st.success(resumen)
-
-        # Mostrar tabla de resultados
-        st.subheader("Resultados por iteración")
-        st.table(resultados)
-
-    except Exception as e:
-        st.error(f"Se produjo un error: {e}")
+    return {
+        "Iteración": [r[0] for r in resultados],
+        "x0": [r[1] for r in resultados],
+        "x1": [r[2] for r in resultados],
+        "x2": [r[3] for r in resultados],
+        "Error": [r[4] for r in resultados],
+        "f(x0)": [r[5] for r in resultados],
+        "f(x1)": [r[6] for r in resultados],
+        "Conclusión": mensaje_final,
+    }
