@@ -22,7 +22,7 @@ from modulos.verificar_traspuesta import verificar_propiedades_matrices, parsear
 from modulos.transpuesta_simple import calcular_transpuesta
 from modulos.multiplicacion_matriz_escalar import multiplicar_matriz_por_escalar 
 from modulos.sistema_ecuaciones import resolver_sistema, graficar_sistema
-from modulos.falsa_posicion import preparar_funcion, falsa_posicion 
+from modulos.falsa_posicion import preprocesar_funcion, metodo_falsa_posicion
 from modulos.metodo_secante import metodo_secante, preprocesar_funcion
 from modulos.metodo_biseccion import parse_function, eval_function, bisection_method
 from modulos.metodo_newton_raphson import preparar_funcion, newton_raphson, graficar_funcion, calcular_raiz
@@ -1147,102 +1147,51 @@ def preparar_funcion(funcion):
         raise ValueError(f"Error al procesar la función: {e}")
 
 # Interfaz en Streamlit
+
 def interfaz_falsa_posicion():
-    st.title("Método de Falsa Posición")
-    st.markdown(
-        """
-        Resuelve ecuaciones no lineales usando el **Método de Falsa Posición**.
-        Proporcione la función, los valores iniciales (`xi`, `xu`), la tolerancia y el máximo de iteraciones.
-        """
-    )
+    """
+    Interfaz gráfica para calcular la raíz de una función usando el método de falsa posición.
+    """
+    st.title("Cálculo de Raíces - Método de Falsa Posición")
 
-    # Entrada de la función matemática
-    st.subheader("Ingrese la función")
-    if "funcion" not in st.session_state:
-        st.session_state["funcion"] = ""
+    st.header("Ingrese los datos necesarios")
+    funcion = st.text_input("Función en términos de x (ejemplo: 3x^2 + 4x - 10):", "3x^2 + 4x - 10")
+    x0 = st.number_input("Valor inicial x0:", value=1.0)
+    x1 = st.number_input("Valor inicial x1:", value=2.0)
+    tolerancia = st.number_input("Tolerancia:", value=0.0001, format="%.8f")
+    max_iter = st.number_input("Número máximo de iteraciones:", value=50, step=1)
 
-    funcion_str = st.text_input(
-        "Función (use 'x' como variable):", 
-        value=st.session_state["funcion"], 
-        placeholder="Ejemplo: x^3 - 6x^2 + 11x - 6"
-    )
-    st.session_state["funcion"] = funcion_str
-
-    # Entradas para parámetros del método
-    st.subheader("Parámetros del Método")
-    col1, col2 = st.columns(2)
-    with col1:
-        xi = st.number_input("Valor inicial xi:", format="%.4f", value=1.0)
-        tolerancia = st.number_input("Tolerancia (%):", format="%.4f", value=0.01)
-    with col2:
-        xu = st.number_input("Valor inicial xu:", format="%.4f", value=2.0)
-        max_iter = st.number_input("Máx. iteraciones:", min_value=1, value=50, step=1)
-
-    # Botón para calcular
     if st.button("Calcular"):
         try:
-            # Validación y preparación de la función
-            funcion = sp.sympify(preparar_funcion(funcion_str))
-            x = sp.symbols('x')
+            # Convertir tolerancia de porcentaje a formato decimal
+            tolerancia_decimal = tolerancia
 
-            # Validación inicial
-            f_xi = funcion.subs(x, xi)
-            f_xu = funcion.subs(x, xu)
-            if f_xi * f_xu > 0:
-                st.error("La función no cambia de signo en el intervalo dado. Intente con otros valores de `xi` y `xu`.")
-                return
+            # Llamar a la lógica del método falsa posición
+            resultados = metodo_falsa_posicion(funcion, x0, x1, tolerancia_decimal, max_iter)
 
-            # Inicialización del método
-            iteracion = 0
-            xr_anterior = None
-            resultados = []
-
-            # Iteraciones del método
-            while iteracion < max_iter:
-                f_xi = funcion.subs(x, xi)
-                f_xu = funcion.subs(x, xu)
-                xr = xu - (f_xu * (xi - xu)) / (f_xi - f_xu)
-                f_xr = funcion.subs(x, xr)
-                ea = abs((xr - xr_anterior) / xr) * 100 if xr_anterior is not None else None
-
-                # Guardar resultados
-                resultados.append(
-                    {
-                        "Iteración": iteracion + 1,
-                        "xi": round(xi, 4),
-                        "xu": round(xu, 4),
-                        "xr": round(xr, 4),
-                        "Error": round(ea, 4) if ea is not None else "-",
-                        "f(xi)": round(f_xi, 4),
-                        "f(xu)": round(f_xu, 4),
-                        "f(xr)": round(f_xr, 4),
-                    }
-                )
-
-                # Verificar convergencia
-                if ea is not None and ea < tolerancia:
-                    break
-
-                # Actualizar intervalos
-                if f_xi * f_xr < 0:
-                    xu = xr
-                else:
-                    xi = xr
-
-                xr_anterior = xr
-                iteracion += 1
-
-            # Mostrar resultados en tabla
+            # Mostrar los resultados iterativos en una tabla
             st.subheader("Resultados por Iteración")
-            st.dataframe(resultados)
+            tabla_resultados = {
+                "Iteración": resultados["Iteración"],
+                "x0": resultados["x0"],
+                "x1": resultados["x1"],
+                "x2": resultados["x2"],
+                "f(x0)": resultados["f(x0)"],
+                "f(x1)": resultados["f(x1)"],
+                "f(x2)": resultados["f(x2)"],
+                "Error": resultados["Error"],
+            }
+            st.table(tabla_resultados)
 
-            # Resumen final
-            st.success(f"Raíz aproximada: {xr:.6f}")
-            st.info(f"Error aproximado: {ea:.6f}")
-            st.info(f"Método converge en {iteracion + 1} iteraciones.")
+            # Mostrar la conclusión en una tabla separada
+            st.subheader("Conclusión")
+            st.write(resultados["Conclusión"])
 
         except Exception as e:
-            st.error(f"Ocurrió un error: {e}")
+            st.error(f"Ha ocurrido un error: {e}")
+
+
+
 
 #####
 
