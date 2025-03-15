@@ -100,7 +100,7 @@ with st.sidebar:
         st.session_state.show_ayuda = not st.session_state.get('show_ayuda', False)
     if st.session_state.get('show_ayuda', False):
         st.write("### Ayuda")
-        st.write("Para más información sobre la calculadora contactar con amoralesl@uamv.edu.ni , dmirandao@uamv.edu.ni , jgonzalez@uamv.edu.ni.")    
+        st.write("Para más información sobre la calculadora contactar con amoralesl@uamv.edu.ni , dmirandao@uamv.edu.ni , jgonzalezj@uamv.edu.ni.")    
 
     if st.button("Juega", key="juega"):
         iniciar_juego()
